@@ -44,15 +44,26 @@ public class Auth implements Serializable{
 	}
 	
 	public boolean equals(Auth user){
-		return (user.username.equals(username) && user.password.equals(password));
+		return (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password));
 	}
 	
 	public boolean equals(Auth[] users){
 		boolean found = false;
 		for(Auth user : users){
 			if(!found){
-				if(user.username.equals(username) && user.password.equals(password))
+				if(user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password))
 					found = true;
+			}
+		}
+		return found;
+	}
+	
+	public Auth authenticate(Auth[] users){
+		Auth found = null;
+		for(Auth user : users){
+			if(found == null){
+				if(user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password))
+					found = user;
 			}
 		}
 		return found;
