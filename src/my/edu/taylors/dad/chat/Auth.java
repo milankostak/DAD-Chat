@@ -2,22 +2,22 @@ package my.edu.taylors.dad.chat;
 
 import java.io.Serializable;
 
-public class Auth implements Serializable{
+public class Auth implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private String username;
 	private String password;
 	private int type;
 	
-	public Auth() {
-		
-	}
+	public Auth() { }
 	
-	public Auth(String username, String password, int type){
+	public Auth(String username, String password, int type) {
 		this.username = username;
 		this.password = password;
 		this.type = type;
 	}
 	
-	public Auth(String username, String password){
+	public Auth(String username, String password) {
 		this.username = username;
 		this.password = password;
 	}
@@ -33,24 +33,27 @@ public class Auth implements Serializable{
 	public String getUsername() {
 		return username;
 	}
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
+
 	public String getPassword() {
 		return password;
 	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
 	
-	public boolean equals(Auth user){
+	public boolean equals(Auth user) {
 		return (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password));
 	}
 	
-	public boolean equals(Auth[] users){
+	public boolean equals(Auth[] users) {
 		boolean found = false;
-		for(Auth user : users){
-			if(!found){
+		for (Auth user : users) {
+			if (!found) {
 				if(user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password))
 					found = true;
 			}
@@ -58,11 +61,11 @@ public class Auth implements Serializable{
 		return found;
 	}
 	
-	public Auth authenticate(Auth[] users){
+	public Auth authenticate(Auth[] users) {
 		Auth found = null;
-		for(Auth user : users){
-			if(found == null){
-				if(user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password))
+		for (Auth user : users) {
+			if (found == null) {
+				if (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password))
 					found = user;
 			}
 		}
