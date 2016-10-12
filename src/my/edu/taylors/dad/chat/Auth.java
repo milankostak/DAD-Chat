@@ -7,7 +7,7 @@ public class Auth implements Serializable{
 	private String password;
 	private int type;
 	
-	public Auth(){
+	public Auth() {
 		
 	}
 	
@@ -15,6 +15,11 @@ public class Auth implements Serializable{
 		this.username = username;
 		this.password = password;
 		this.type = type;
+	}
+	
+	public Auth(String username, String password){
+		this.username = username;
+		this.password = password;
 	}
 	
 	public int getType() {
