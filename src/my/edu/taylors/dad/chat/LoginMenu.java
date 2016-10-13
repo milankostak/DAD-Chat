@@ -1,6 +1,7 @@
 package my.edu.taylors.dad.chat;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -35,24 +36,24 @@ public class LoginMenu extends JFrame {
 		// general layout
 		BorderLayout mainLayout = new BorderLayout(); 
 		setLayout(mainLayout);
-        add(getInputPanel(), BorderLayout.CENTER);
-        add(getBottomPanel(), BorderLayout.PAGE_END);
+		add(getInputPanel(), BorderLayout.CENTER);
+		add(getBottomPanel(), BorderLayout.PAGE_END);
 
 		// basic settings and packing
-        setTitle("Login to system");
+		setTitle("Login to system");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		pack();
 		setLocationRelativeTo(null);
 	}
-	
-	private JPanel getInputPanel() {
+
+	private Component getInputPanel() {
 		// labels
 		JLabel lbUsername = new JLabel("Username");
 		lbUsername.setHorizontalAlignment(JLabel.CENTER);
 		JLabel lbPassword = new JLabel("Password");
 		lbPassword.setHorizontalAlignment(JLabel.CENTER);
-		
+
 		// inputs
 		tfUsername = new JTextField(15);
 		tfPassword = new JPasswordField(15);
@@ -71,22 +72,22 @@ public class LoginMenu extends JFrame {
 
 		return inputPanel;
 	}
-	
-	private JPanel getBottomPanel() {
+
+	private Component getBottomPanel() {
 		// button
 		JButton btLogin = new JButton("Login");
 		btLogin.setMnemonic(KeyEvent.VK_L);
 		btLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btLogin.addActionListener(e -> authenticate());
-		
+
 		// bottom box
 		FlowLayout bottomLayout = new FlowLayout(FlowLayout.CENTER);
 		JPanel bottomPanel = new JPanel(bottomLayout);
 		bottomPanel.add(btLogin);
-		
+
 		return bottomPanel;
 	}
-	
+
 	private Auth getAuth() {
 		String username = tfUsername.getText();
 		char[] passwordChars = tfPassword.getPassword();
@@ -101,7 +102,7 @@ public class LoginMenu extends JFrame {
 		Socket socket = null;
 		try {
 			try {
-				socket = new Socket("192.168.137.25", 9999);
+				socket = new Socket("127.0.0.1", 9999);
 
 				// send credentials to server for authentication
 				ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
@@ -110,6 +111,10 @@ public class LoginMenu extends JFrame {
 				// read the result msg from server
 				BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				System.out.println(fromServer.readLine());
+
+				//TODO server returns info a we open the right windows, for now just client
+				new ClientGui();
+				this.setVisible(false);
 
 			} finally {
 				if (socket != null) socket.close();
@@ -121,6 +126,8 @@ public class LoginMenu extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new LoginMenu().setVisible(true);
+		//new LoginMenu().setVisible(true);
+		new ClientGui();
 	}
+
 }
