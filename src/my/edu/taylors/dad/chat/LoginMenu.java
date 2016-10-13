@@ -107,7 +107,7 @@ public class LoginMenu extends JFrame {
 		Auth auth = getAuth();
 		Socket socket = null;
 		try {
-			socket = new Socket("127.0.0.1", 9999);
+			socket = new Socket("192.168.137.25", 9999);
 
 			// send credentials to server for authentication
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
@@ -116,7 +116,8 @@ public class LoginMenu extends JFrame {
 			// read the result msg from server
 			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-			switch(Integer.parseInt(fromServer.readLine())){
+			int type = Integer.parseInt(fromServer.readLine());
+			switch (type) {
 				case 0:
 					// Guest
 					new ClientGui(socket);
@@ -137,13 +138,15 @@ public class LoginMenu extends JFrame {
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			if (socket != null)
+			if (socket != null) {
 				try {
 					socket.close();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-			System.out.println("An error occurred when trying to authenticate a user.");
+			}
+			JOptionPane.showOptionDialog(null, "An error eccoured when trying to auhtneticate you. Server is not responding. Please try gagin later.",
+					"Authentication error", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
 		}
 	}
 

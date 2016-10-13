@@ -16,11 +16,11 @@ public class ChatListModel extends AbstractListModel<Message> {
 
 	public ChatListModel() {
 		messages = new ArrayList<>();
-		messages.add(new Message(new Date(), "asdf", ClientType.AGENT));
-		messages.add(new Message(new Date(), "bfhng", ClientType.AGENT));
-		messages.add(new Message(new Date(), "agfhngfhnsdf", ClientType.AGENT));
-		messages.add(new Message(new Date(), "g", ClientType.AGENT));
-		messages.add(new Message(new Date(), "nnnn", ClientType.AGENT));
+		messages.add(new Message(new Date(), "asdf", ClientType.NOT_ME));
+		messages.add(new Message(new Date(), "bfhng", ClientType.NOT_ME));
+		messages.add(new Message(new Date(), "agfhngfhnsdf", ClientType.NOT_ME));
+		messages.add(new Message(new Date(), "g", ClientType.NOT_ME));
+		messages.add(new Message(new Date(), "nnnn", ClientType.NOT_ME));
 	}
 
 	public List<Message> getMessages() {

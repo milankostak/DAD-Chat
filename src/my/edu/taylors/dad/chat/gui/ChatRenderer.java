@@ -18,7 +18,7 @@ public class ChatRenderer implements ListCellRenderer<Message> {
 
 		JLabel label = new JLabel(value.toString());
 
-		if (value.getClientType() == ClientType.CUSTOMER) {
+		if (value.getClientType() == ClientType.ME) {
 			label.setHorizontalAlignment(SwingConstants.RIGHT);
 		} else {
 			label.setHorizontalAlignment(SwingConstants.LEFT);

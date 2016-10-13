@@ -41,11 +41,11 @@ public class Message {
 
 	@Override
 	public String toString() {
-		return prepareTime() + ": " + message;
+		return prepareTime() + "  " + message;
 	}
 	
 	private String prepareTime() {
-		return new SimpleDateFormat("HH:mm:ss").format(time);
+		return new SimpleDateFormat("HH:mm").format(time);
 	}
 
 }
