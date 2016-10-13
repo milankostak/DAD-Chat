@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -113,11 +114,28 @@ public class LoginMenu extends JFrame {
 
 				// read the result msg from server
 				BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				System.out.println(fromServer.readLine());
-
+//				System.out.println(fromServer.readLine());
+				switch(Integer.parseInt(fromServer.readLine())){
+					case 0:
+						// Guest
+						new ClientGui();
+						this.setVisible(false);
+						break;
+						
+					case 1:
+						// Agent
+						new ClientGui();
+						this.setVisible(false);
+						break;
+						
+					default:
+						// Wrong combination or error
+						JOptionPane.showOptionDialog(null, "Wrong combination", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
+						break;
+				}
 				//TODO server returns info a we open the right windows, for now just client
-				new ClientGui();
-				this.setVisible(false);
+//				new ClientGui();
+//				this.setVisible(false);
 
 			} finally {
 				if (socket != null) socket.close();
@@ -129,8 +147,8 @@ public class LoginMenu extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		//new LoginMenu().setVisible(true);
-		new ClientGui();
+		new LoginMenu().setVisible(true);
+//		new ClientGui();
 	}
 
 }

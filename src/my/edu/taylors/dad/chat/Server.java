@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.ClientType;
 
 public class Server {
 	static Auth[] users = {new Auth("omar", "123", 0),
@@ -19,6 +20,7 @@ public class Server {
 	static ArrayBlockingQueue<Socket> connectionQueue;
 	
 	public static void main(String args[]){
+		connectionQueue = new ArrayBlockingQueue<Socket>(5);
 		ServerSocket server = null;
 		try{
 			server = new ServerSocket(9999);
@@ -34,19 +36,23 @@ public class Server {
 				if((usr = user.authenticate(users)) != null){
 					// 1 - Agent, 0 - Guest
 					if(usr.getType() == 0){
-						pw.println("Welcome " + usr.getUsername() + ", you are our guest now !");
+//						pw.println("Welcome " + usr.getUsername() + ", you are our guest now !");
+						pw.println("0");
 						connectionQueue.put(client);
 					}else{
-						pw.println("Welcome " + usr.getUsername() + ", you are an agent !");
+//						pw.println("Welcome " + usr.getUsername() + ", you are an agent !");
 						new Agent(client);
+						pw.println("1");
 					}
 				}else{
-					pw.println("Wrong combination");
+//					pw.println("Wrong combination");
+					pw.println("-1");
 				}
 			}
 			
 		}catch(Exception e){
 			System.out.println("Server Error");
+			e.printStackTrace();
 		} finally{
 			try {
 				server.close();
