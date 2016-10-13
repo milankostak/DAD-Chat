@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +34,6 @@ public class LoginMenu extends JFrame {
 
 	public LoginMenu() {
 		setUpGui();
-		//authenticate();
 	}
 
 	private void setUpGui() {
@@ -60,7 +60,9 @@ public class LoginMenu extends JFrame {
 
 		// inputs
 		tfUsername = new JTextField(15);
+		tfUsername.addKeyListener(new AuthenticateKeyAdapter());
 		tfPassword = new JPasswordField(15);
+		tfPassword.addKeyListener(new AuthenticateKeyAdapter());
 
 		GridLayout inputGridLayout = new GridLayout(2, 2);
 		JPanel inputPanel = new JPanel(inputGridLayout);
@@ -105,50 +107,56 @@ public class LoginMenu extends JFrame {
 		Auth auth = getAuth();
 		Socket socket = null;
 		try {
-			try {
-				socket = new Socket("127.0.0.1", 9999);
+			socket = new Socket("127.0.0.1", 9999);
 
-				// send credentials to server for authentication
-				ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-				output.writeObject(auth);
+			// send credentials to server for authentication
+			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+			output.writeObject(auth);
 
-				// read the result msg from server
-				BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//				System.out.println(fromServer.readLine());
-				switch(Integer.parseInt(fromServer.readLine())){
-					case 0:
-						// Guest
-						new ClientGui();
-						this.setVisible(false);
-						break;
-						
-					case 1:
-						// Agent
-						new ClientGui();
-						this.setVisible(false);
-						break;
-						
-					default:
-						// Wrong combination or error
-						JOptionPane.showOptionDialog(null, "Wrong combination", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
-						break;
-				}
-				//TODO server returns info a we open the right windows, for now just client
-//				new ClientGui();
-//				this.setVisible(false);
+			// read the result msg from server
+			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-			} finally {
-				if (socket != null) socket.close();
+			switch(Integer.parseInt(fromServer.readLine())){
+				case 0:
+					// Guest
+					new ClientGui(socket);
+					this.setVisible(false);
+					break;
+					
+				case 1:
+					// Agent
+					new ClientGui(socket);
+					this.setVisible(false);
+					break;
+					
+				default:
+					// Wrong combination or error
+					JOptionPane.showOptionDialog(null, "Wrong combination", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
+					break;
 			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
+			if (socket != null)
+				try {
+					socket.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			System.out.println("An error occurred when trying to authenticate a user.");
 		}
 	}
 
 	public static void main(String[] args) {
 		new LoginMenu().setVisible(true);
-//		new ClientGui();
+	}
+
+	private class AuthenticateKeyAdapter extends KeyAdapter {
+		public void keyReleased(KeyEvent e) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				authenticate();
+			}
+		}
 	}
 
 }
