@@ -1,10 +1,13 @@
-package my.edu.taylors.dad.chat;
+package my.edu.taylors.dad.chat.gui;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
+
+import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Message;
 
 public class ChatListModel extends AbstractListModel<Message> {
 	private static final long serialVersionUID = 1L;

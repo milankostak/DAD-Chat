@@ -1,4 +1,4 @@
-package my.edu.taylors.dad.chat;
+package my.edu.taylors.dad.chat.gui;
 
 import java.awt.Component;
 
@@ -6,6 +6,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
+
+import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Message;
 
 public class ChatRenderer implements ListCellRenderer<Message> {
 

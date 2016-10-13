@@ -1,4 +1,4 @@
-package my.edu.taylors.dad.chat;
+package my.edu.taylors.dad.chat.entity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

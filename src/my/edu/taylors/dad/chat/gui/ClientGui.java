@@ -1,4 +1,4 @@
-package my.edu.taylors.dad.chat;
+package my.edu.taylors.dad.chat.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -19,6 +19,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+
+import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Message;
 
 public class ClientGui extends JFrame {
 	private static final long serialVersionUID = 1L;

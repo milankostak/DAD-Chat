@@ -20,6 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.gui.ClientGui;
+
 public class LoginMenu extends JFrame {
 	
 	private static final long serialVersionUID = 1L;

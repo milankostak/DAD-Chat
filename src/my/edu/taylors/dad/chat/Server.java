@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import my.edu.taylors.dad.chat.entity.Auth;
+
 public class Server {
 	static Auth[] users = {new Auth("omar", "123", 0),
 			new Auth("test", "123", 0),

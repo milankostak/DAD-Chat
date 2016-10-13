@@ -6,6 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import my.edu.taylors.dad.chat.entity.Auth;
+
 public class Agent{
 	private Socket agentSocket = null;
 	
