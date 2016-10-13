@@ -41,8 +41,8 @@ public class Server {
 						connectionQueue.put(client);
 					}else{
 //						pw.println("Welcome " + usr.getUsername() + ", you are an agent !");
-						new Agent(client);
 						pw.println("1");
+						new Agent(client);
 					}
 				}else{
 //					pw.println("Wrong combination");
