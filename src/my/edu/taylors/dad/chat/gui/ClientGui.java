@@ -6,6 +6,10 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
@@ -23,31 +27,49 @@ import javax.swing.SwingConstants;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 
-public class ClientGui extends JFrame {
-	private static final long serialVersionUID = 1L;
+public class ClientGui extends Thread {
 
 	private JTextField tfMainInput;
 	private ChatListModel chatListModel;
 	private JScrollBar vertical;
+	private Socket socket;
 
-	public ClientGui() {
+	public ClientGui(Socket socket) {
+		this.socket = socket;
 		setUpGui();
-		setVisible(true);
+		start();
+	}
+	
+	@Override
+	public void run() {
+		try {
+			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			while (true) {
+				String message = fromServer.readLine();
+				Message msg = new Message(new Date(), message, ClientType.AGENT);
+				addMessage(msg);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void setUpGui() {
 		// general layout
+		JFrame mainFrame = new JFrame();
 		BorderLayout mainLayout = new BorderLayout(); 
-		setLayout(mainLayout);
-		add(getMessagePanel(), BorderLayout.CENTER);
-		add(getBottomInputPanel(), BorderLayout.PAGE_END);
-		setMinimumSize(new Dimension(500, 400));
+		mainFrame.setLayout(mainLayout);
+		mainFrame.add(getMessagePanel(), BorderLayout.CENTER);
+		mainFrame.add(getBottomInputPanel(), BorderLayout.PAGE_END);
+		mainFrame.setMinimumSize(new Dimension(500, 400));
 
 		// basic settings and packing
-		setTitle("System");//TODO name
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		pack();
-		setLocationRelativeTo(null);
+		mainFrame.setTitle("System");//TODO name
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.pack();
+		mainFrame.setLocationRelativeTo(null);
+		mainFrame.setVisible(true);
 	}
 
 	private Component getMessagePanel() {
@@ -66,7 +88,7 @@ public class ClientGui extends JFrame {
 
 		return chatListScroll;
 	}
-	
+
 	private void scrollDown() {
 		vertical.setValue(vertical.getMaximum());
 	}
@@ -98,7 +120,12 @@ public class ClientGui extends JFrame {
 		tfMainInput.setText("");
 		
 		Message newMessage = new Message(new Date(), message, ClientType.CUSTOMER);
-		chatListModel.getMessages().add(newMessage);
+		
+		addMessage(newMessage);
+	}
+	
+	private void addMessage(Message message) {
+		chatListModel.getMessages().add(message);
 		chatListModel.update();
 		scrollDown();
 	}
