@@ -3,10 +3,12 @@ package my.edu.taylors.dad.chat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.ClientInfo;
 
 public class Agent{
 	private static Socket agentSocket = null;
@@ -30,6 +32,7 @@ public class Agent{
 	
 	private static class ConnectionHandler extends Thread {
 		Socket client;
+		ClientInfo clientInfo;
 		BufferedReader br = null;
 		public ConnectionHandler() {
 			start();
@@ -38,23 +41,40 @@ public class Agent{
 		public void run(){
 			while(true){
 				try{
-					client = Server.connectionQueue.take();
+					clientInfo = Server.connectionQueue.take();
+					client = clientInfo.getSocket();
+//					System.out.println("New window is created");
 					try{
 						// Send a test message to the client when connecting
 						PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
+						PrintWriter agentWriter = new PrintWriter(agentSocket.getOutputStream(), true);
+						ObjectOutputStream output = new ObjectOutputStream(agentSocket.getOutputStream());
+						clientInfo.getAuth().setPassword("");
+						output.writeObject(clientInfo.getAuth());
 						pw.println("Hello there, I'm " + userInfo.getUsername());
 //						ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 						br = new BufferedReader(new InputStreamReader(client.getInputStream()));
 						System.out.println("Client connected with IP: " + client.getRemoteSocketAddress());
-						//Handle the messages here
 						pw.flush();
-						client.close();
+						//Handle the messages here
+						while(true){
+							String receivedMsg = br.readLine();
+							if(receivedMsg != null)
+								agentWriter.println(receivedMsg);
+						}
 					}catch(Exception e){
 						System.out.println("Connection error ...");
 						e.printStackTrace();
 					}
 				}catch(InterruptedException e){
 					System.out.println("Error interrupted");
+				}finally{
+					try {
+						client.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}

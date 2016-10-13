@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.ClientInfo;
 
 public class Server {
 	static Auth[] users = {new Auth("omar", "123", 0),
@@ -17,10 +17,10 @@ public class Server {
 			new Auth("agent", "root", 1)};
 	
 	static Socket client = null;
-	static ArrayBlockingQueue<Socket> connectionQueue;
+	static ArrayBlockingQueue<ClientInfo> connectionQueue;
 	
 	public static void main(String args[]){
-		connectionQueue = new ArrayBlockingQueue<Socket>(5);
+		connectionQueue = new ArrayBlockingQueue<ClientInfo>(5);
 		ServerSocket server = null;
 		try{
 			server = new ServerSocket(9999);
@@ -38,7 +38,8 @@ public class Server {
 					if(usr.getType() == 0){
 //						pw.println("Welcome " + usr.getUsername() + ", you are our guest now !");
 						pw.println("0");
-						connectionQueue.put(client);
+						ClientInfo clientInfo = new ClientInfo(usr, client);
+						connectionQueue.put(clientInfo);
 					}else{
 //						pw.println("Welcome " + usr.getUsername() + ", you are an agent !");
 						pw.println("1");
