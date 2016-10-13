@@ -12,7 +12,7 @@ public class Agent{
 	private static Socket agentSocket = null;
 	private static Auth userInfo = null;
 	
-	public Agent(Socket agentSocket){
+	public Agent(Socket agentSocket, Auth userInfo){
 		try {
 			PrintWriter pw = new PrintWriter(agentSocket.getOutputStream(), true);
 			pw.println("Welcome agent !");
@@ -25,6 +25,7 @@ public class Agent{
 			new ConnectionHandler();
 		}
 		this.agentSocket = agentSocket;
+		this.userInfo = userInfo;
 	}
 	
 	private static class ConnectionHandler extends Thread {
@@ -50,6 +51,7 @@ public class Agent{
 						client.close();
 					}catch(Exception e){
 						System.out.println("Connection error ...");
+						e.printStackTrace();
 					}
 				}catch(InterruptedException e){
 					System.out.println("Error interrupted");

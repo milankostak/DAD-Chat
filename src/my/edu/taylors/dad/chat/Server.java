@@ -42,7 +42,7 @@ public class Server {
 					}else{
 //						pw.println("Welcome " + usr.getUsername() + ", you are an agent !");
 						pw.println("1");
-						new Agent(client);
+						new Agent(client, usr);
 					}
 				}else{
 //					pw.println("Wrong combination");
