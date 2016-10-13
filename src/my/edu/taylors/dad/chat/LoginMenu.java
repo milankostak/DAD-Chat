@@ -9,7 +9,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
@@ -107,26 +109,30 @@ public class LoginMenu extends JFrame {
 		Auth auth = getAuth();
 		Socket socket = null;
 		try {
-			socket = new Socket("192.168.137.25", 9999);
+			socket = new Socket("127.0.0.1", 9999);
 
 			// send credentials to server for authentication
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 			output.writeObject(auth);
 
-			// read the result msg from server
+			// read the result message from server
 			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
+			
 			int type = Integer.parseInt(fromServer.readLine());
 			switch (type) {
 				case 0:
 					// Guest
-					new ClientGui(socket);
+					ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+					Auth agent = (Auth) ois.readObject();
+					int id = agent.getId();
+					System.out.println(agent);
+					new ClientGui(socket, "Customer: " + auth.getUsername(), id);
 					this.setVisible(false);
 					break;
 					
 				case 1:
 					// Agent
-					new ClientGui(socket);
+					new ClientAgent(socket);
 					this.setVisible(false);
 					break;
 					
@@ -136,7 +142,7 @@ public class LoginMenu extends JFrame {
 					break;
 			}
 
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			if (socket != null) {
 				try {

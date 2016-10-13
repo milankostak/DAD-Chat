@@ -8,18 +8,21 @@ public class Auth implements Serializable {
 	private String username;
 	private String password;
 	private int type;
+	private int id;
 	
-	public Auth() { }
-	
+	public Auth(String username, String password) {
+		this(username, password, 0);
+	}
+
 	public Auth(String username, String password, int type) {
+		this(username, password, 0, 0);
+	}
+
+	public Auth(String username, String password, int type, int id) {
 		this.username = username;
 		this.password = password;
 		this.type = type;
-	}
-	
-	public Auth(String username, String password) {
-		this.username = username;
-		this.password = password;
+		this.id = id;
 	}
 	
 	public int getType() {
@@ -45,7 +48,15 @@ public class Auth implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public boolean equals(Auth user) {
 		return (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password));
 	}
@@ -71,4 +82,10 @@ public class Auth implements Serializable {
 		}
 		return found;
 	}
+
+	@Override
+	public String toString() {
+		return "Auth [username=" + username + ", password=" + password + ", type=" + type + ", id=" + id + "]";
+	}
+
 }
