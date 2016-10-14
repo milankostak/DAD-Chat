@@ -50,33 +50,41 @@ public class ServerAgent extends Thread {
 			try {
 				Socket client = null;
 				try {
-					int tempWindowId = windowCount++;
-					clientInfo = Server.connectionQueue.take();
-					client = clientInfo.getSocket();
-					customersMap.put(clientInfo.getAuth().getId(), client);
-
-					// send customer to agent
-					ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
-					AuthWithWindowId customerWId = new AuthWithWindowId(clientInfo.getAuth(), tempWindowId);
-					output.writeObject(customerWId);
-
-					// send agent to customer
-					ObjectOutputStream output2 = new ObjectOutputStream(client.getOutputStream());
-					AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
-					output2.writeObject(agentWId);
-
-					setReceivingThread(client);
-
-					// client to agent
-					BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
-					PrintWriter pw = new PrintWriter(agentSocket.getOutputStream(), true);
-					// TODO ending
 					while (true) {
-						String receivedId = br.readLine();
-						String receivedMsg = br.readLine();
+						int tempWindowId = windowCount++;
+						clientInfo = Server.connectionQueue.take();
+						client = clientInfo.getSocket();
+						customersMap.put(clientInfo.getAuth().getId(), client);
+	
+						// send customer to agent
+						ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
+						AuthWithWindowId customerWId = new AuthWithWindowId(clientInfo.getAuth(), tempWindowId);
+						output.writeObject(customerWId);
+	
+						// send agent to customer
+						ObjectOutputStream output2 = new ObjectOutputStream(client.getOutputStream());
+						AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
+						output2.writeObject(agentWId);
+	
+						setReceivingThread(client);
+	
+						// client to agent
+						BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
+						PrintWriter pw = new PrintWriter(agentSocket.getOutputStream(), true);
 
-						pw.println(receivedId);
-						pw.println(receivedMsg);
+						// customer to agent
+						boolean keepReceiving = true;
+						while (keepReceiving) {
+							String receivedId = br.readLine();
+							String receivedMsg = br.readLine();
+							if (receivedId.equals("-1")) {
+								keepReceiving = false;
+								client.close();
+							} else {
+								pw.println(receivedId);
+								pw.println(receivedMsg);
+							}
+						}
 					}
 				} finally {
 					if (client != null) client.close();
@@ -91,7 +99,7 @@ public class ServerAgent extends Thread {
 			Thread thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					// agent to client
+					// agent to customer
 					try {
 						BufferedReader br = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
 						while (true) {

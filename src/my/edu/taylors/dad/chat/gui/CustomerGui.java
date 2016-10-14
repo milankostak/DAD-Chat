@@ -19,6 +19,8 @@ public class CustomerGui extends ChatWindow {
 	private PrintWriter writer;
 	private boolean keepReceiving;
 	private int otherSideId;	
+	
+	private Thread thread;
 
 	public CustomerGui(Socket socket, String title, int otherSideId) {
 		super(title, ClientType.CUSTOMER);
@@ -36,7 +38,7 @@ public class CustomerGui extends ChatWindow {
 	}
 
 	private void setReceivingThread() {
-		Thread thread = new Thread(new Runnable() {
+		thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -64,7 +66,21 @@ public class CustomerGui extends ChatWindow {
 		try {
 			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	protected void logOut() {
+		writer.println("-1");
+		writer.println();
+		writer.flush();
+		keepReceiving = false;
+		this.setVisible(false);
+		try {
+			socket.close();
+			thread.join();
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

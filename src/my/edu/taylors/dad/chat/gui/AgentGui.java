@@ -39,4 +39,10 @@ public class AgentGui extends ChatWindow {
 		}
 	}
 
+	@Override
+	protected void logOut() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

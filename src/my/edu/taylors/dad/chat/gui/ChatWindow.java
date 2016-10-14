@@ -40,6 +40,8 @@ public abstract class ChatWindow extends JFrame {
 	}
 
 	protected abstract void setupWriter();
+
+	protected abstract void logOut();
 	
 	protected abstract void sendMessage(String message);
 
@@ -93,19 +95,25 @@ public abstract class ChatWindow extends JFrame {
 		bottomLayout.setHgap(5);
 		JPanel bottomPanel = new JPanel(bottomLayout);
 		bottomPanel.add(tfMainInput, BorderLayout.CENTER);
+
+		JPanel btPanel = new JPanel(new FlowLayout());
+		btPanel.add(btSend);
 		
 		if (clientType == ClientType.AGENT) {
 			JButton btSendBoth = new JButton("Send both");
 			btSendBoth.setMnemonic(KeyEvent.VK_B);
 			btSendBoth.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			btSendBoth.addActionListener(e -> showMessageBoth());
-			JPanel btPanel = new JPanel(new FlowLayout());
-			btPanel.add(btSend);
 			btPanel.add(btSendBoth);
-			bottomPanel.add(btPanel, BorderLayout.EAST);
-		} else {
-			bottomPanel.add(btSend, BorderLayout.EAST);
 		}
+
+		JButton btLogOut = new JButton("Log Out");
+		btLogOut.setMnemonic(KeyEvent.VK_L);
+		btLogOut.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btLogOut.addActionListener(e -> logOut());
+		btPanel.add(btLogOut);
+
+		bottomPanel.add(btPanel, BorderLayout.EAST);
 		
 		bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
