@@ -14,5 +14,6 @@ public class WaitingWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(380, 150);
+		setLocationRelativeTo(null);
 	}
 }
