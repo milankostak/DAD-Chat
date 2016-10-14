@@ -14,13 +14,22 @@ public class ClientInfo {
 	public Auth getAuth() {
 		return auth;
 	}
+
 	public void setAuth(Auth auth) {
 		this.auth = auth;
 	}
+
 	public Socket getSocket() {
 		return socket;
 	}
+
 	public void setSocket(Socket socket) {
 		this.socket = socket;
 	}
+
+	@Override
+	public String toString() {
+		return "ClientInfo [auth=" + auth + ", socket=" + socket + "]";
+	}
+
 }

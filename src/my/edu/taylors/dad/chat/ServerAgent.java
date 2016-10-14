@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
 
 public class ServerAgent extends Thread {
@@ -49,21 +50,20 @@ public class ServerAgent extends Thread {
 			try {
 				Socket client = null;
 				try {
+					int tempWindowId = windowCount++;
 					clientInfo = Server.connectionQueue.take();
 					client = clientInfo.getSocket();
 					customersMap.put(clientInfo.getAuth().getId(), client);
 
 					// send customer to agent
 					ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
-					output.writeObject(clientInfo.getAuth());
-					PrintWriter pw2 = new PrintWriter(waitingAgent.getOutputStream(), true);
-					pw2.println(windowCount);
+					AuthWithWindowId authWId = new AuthWithWindowId(clientInfo.getAuth(), tempWindowId);
+					output.writeObject(authWId);
 
 					// send agent to customer
-					agent.setId(windowCount);// window count, for both windows different
-					windowCount++;
+					AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
 					ObjectOutputStream output2 = new ObjectOutputStream(client.getOutputStream());
-					output2.writeObject(agent);
+					output2.writeObject(agentWId);
 
 					setReceivingThread(client);
 

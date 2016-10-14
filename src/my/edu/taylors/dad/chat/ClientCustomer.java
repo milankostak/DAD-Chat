@@ -7,6 +7,7 @@ import java.net.Socket;
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.CustomerGui;
@@ -34,8 +35,9 @@ public class ClientCustomer extends Thread {
 	public void run() {
 		try {
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-			Auth agent = (Auth) ois.readObject();
-			int agentWindowId = agent.getId();
+			AuthWithWindowId agent = (AuthWithWindowId) ois.readObject();
+			System.out.println("Client received agent: " + agent.toString());
+			int agentWindowId = agent.getWindowId();
 			waitingWindow.setVisible(false);
 			CustomerGui gui = new CustomerGui(socket, "Customer: " + authCustomer.getUsername(), agentWindowId);
 			gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));

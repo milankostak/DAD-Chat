@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.AgentGui;
@@ -85,13 +86,13 @@ public class ClientAgent extends Thread {
 				connectingSocket = new Socket("127.0.0.1", 9998);
 				while (true) {
 					// get customer info
+					System.out.println("Agent receiving customer info");
 					ObjectInputStream ios = new ObjectInputStream(connectingSocket.getInputStream());
-					Auth customer = (Auth) ios.readObject();
-					int clientId = customer.getId();
+					AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
+					System.out.println("customer " + customer.toString());
 
-					BufferedReader fromServer = new BufferedReader(new InputStreamReader(connectingSocket.getInputStream()));
-					String wId = fromServer.readLine();
-					int windowId = Integer.parseInt(wId);
+					int clientId = customer.getId();
+					int windowId = customer.getWindowId();
 
 					AgentGui gui = new AgentGui(socket, "Agent: " + customer.getUsername(), clientId);
 					windows.put(windowId, gui);
