@@ -60,7 +60,8 @@ public class ClientGui extends ChatWindow {
 		thread.start();
 	}
 	
-	private void setupWriter() {
+	@Override
+	protected void setupWriter() {
 		try {
 			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 		} catch (IOException e) {

@@ -18,6 +18,7 @@ public class Agent extends Thread {
 	private Socket waitingAgent;
 	private Map<Integer, Socket> customersMap = new HashMap<>();
 	private Auth agent;
+	private static int windowCount = 0;
 	
 	public Agent(Socket agentSocket, Auth agent, ServerSocket server2) {
 		this.agent = agent;
@@ -52,24 +53,27 @@ public class Agent extends Thread {
 					client = clientInfo.getSocket();
 					customersMap.put(clientInfo.getAuth().getId(), client);
 
-					// send agent to client
+					// send customer to agent
 					ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
 					output.writeObject(clientInfo.getAuth());
-					// send client to agent
+					PrintWriter pw2 = new PrintWriter(waitingAgent.getOutputStream(), true);
+					pw2.println(windowCount);
+					// send agent to customer
+					agent.setId(windowCount);// window count, for both windows different
+					windowCount++;
 					ObjectOutputStream output2 = new ObjectOutputStream(client.getOutputStream());
 					output2.writeObject(agent);
-					
+
 					setReceivingThread(client);
-					
-					//customersMap.put(ID, client);
 
 					// client to agent
 					BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
+					PrintWriter pw = new PrintWriter(agentSocket.getOutputStream(), true);
 					while (true) {
+						String receivedId = br.readLine();
 						String receivedMsg = br.readLine();
-//						Socket agent = customerAgentMap.get(client);
-						PrintWriter pw = new PrintWriter(agentSocket.getOutputStream(), true);
-//						pw.println(ID);
+
+						pw.println(receivedId);
 						pw.println(receivedMsg);
 					}
 				} finally {
@@ -90,7 +94,6 @@ public class Agent extends Thread {
 						BufferedReader br = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
 						while (true) {
 							String clientId = br.readLine();
-							System.out.println(clientId);
 							String receivedMsg = br.readLine();
 
 							Socket client = customersMap.get(Integer.parseInt(clientId));

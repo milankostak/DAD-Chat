@@ -36,6 +36,10 @@ public abstract class ChatWindow extends JFrame {
 		setUpGui(title);
 	}
 
+	protected abstract void setupWriter();
+	
+	protected abstract void sendMessage(String message);
+
 	private void setUpGui(String title) {
 		// general layout
 		mainFrame = new JFrame();
@@ -107,7 +111,7 @@ public abstract class ChatWindow extends JFrame {
 		sendMessage(message);
 	}
 
-	protected void addMessage(Message message) {
+	public void addMessage(Message message) {
 		chatListModel.getMessages().add(message);
 		chatListModel.update();
 		scrollDown();
@@ -116,8 +120,6 @@ public abstract class ChatWindow extends JFrame {
 	private void scrollDown() {
 		vertical.setValue(vertical.getMaximum());
 	}
-	
-	protected abstract void sendMessage(String message);
 
 	private class MainInputKeyAdapter extends KeyAdapter {
 		public void keyReleased(KeyEvent e) {

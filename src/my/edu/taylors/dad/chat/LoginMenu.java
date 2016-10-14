@@ -9,7 +9,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -120,22 +119,23 @@ public class LoginMenu extends JFrame {
 			
 			int type = Integer.parseInt(fromServer.readLine());
 			switch (type) {
+				// Guest
 				case 0:
-					// Guest
+					// get agent info
 					ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 					Auth agent = (Auth) ois.readObject();
-					int id = agent.getId();
-					System.out.println("Agent "+agent);
-					new ClientGui(socket, "Customer: " + auth.getUsername(), id);
+					int agentWindowId = agent.getId();
+
+					new ClientGui(socket, "Customer: " + auth.getUsername(), agentWindowId);
 					this.setVisible(false);
 					break;
-					
+
+				// Agent
 				case 1:
-					// Agent
 					new ClientAgent(socket);
 					this.setVisible(false);
 					break;
-					
+
 				default:
 					// Wrong combination or error
 					JOptionPane.showOptionDialog(null, "Wrong combination", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
