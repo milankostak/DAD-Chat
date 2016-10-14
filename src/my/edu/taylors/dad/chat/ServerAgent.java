@@ -57,12 +57,12 @@ public class ServerAgent extends Thread {
 
 					// send customer to agent
 					ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
-					AuthWithWindowId authWId = new AuthWithWindowId(clientInfo.getAuth(), tempWindowId);
-					output.writeObject(authWId);
+					AuthWithWindowId customerWId = new AuthWithWindowId(clientInfo.getAuth(), tempWindowId);
+					output.writeObject(customerWId);
 
 					// send agent to customer
-					AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
 					ObjectOutputStream output2 = new ObjectOutputStream(client.getOutputStream());
+					AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
 					output2.writeObject(agentWId);
 
 					setReceivingThread(client);

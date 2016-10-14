@@ -89,6 +89,7 @@ public class ClientAgent extends Thread {
 					System.out.println("Agent receiving customer info");
 					ObjectInputStream ios = new ObjectInputStream(connectingSocket.getInputStream());
 					AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
+					//TODO StreamCorruptedException when written two customers at server side
 					System.out.println("customer " + customer.toString());
 
 					int clientId = customer.getId();
