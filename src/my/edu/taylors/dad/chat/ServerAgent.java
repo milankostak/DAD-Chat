@@ -102,12 +102,12 @@ public class ServerAgent extends Thread {
 					// agent to customer
 					try {
 						BufferedReader br = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
-						while (true) {
+						while (true && !client.isClosed()) {
 							String clientId = br.readLine();
 							String receivedMsg = br.readLine();
 
 							Socket client = customersMap.get(Integer.parseInt(clientId));
-							if (client != null) {
+							if (client != null && !client.isClosed()) {
 								PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
 								pw.println(receivedMsg);
 							}
