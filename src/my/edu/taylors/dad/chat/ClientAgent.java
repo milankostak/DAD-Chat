@@ -41,6 +41,7 @@ public class ClientAgent extends Thread {
 	
 	public static void sendBoth(String message) {
 		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
+			System.out.println(entry.getKey());
 			AgentGui gui = entry.getValue();
 			gui.showMessage(message);
 		}
@@ -77,7 +78,7 @@ public class ClientAgent extends Thread {
 
 	@Override
 	public void run() {
-		// this thread wait for server to tell that new customer was assigned to agent
+		// this thread wait for server to tell that new customer was assigned to this agent
 		try {
 			Socket connectingSocket = null;
 			try {

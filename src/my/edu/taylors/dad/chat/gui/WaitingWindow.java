@@ -13,6 +13,7 @@ public class WaitingWindow extends JFrame {
 		add(new JLabel(message, loading, JLabel.CENTER));
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
 		setSize(380, 150);
 		setLocationRelativeTo(null);
 	}

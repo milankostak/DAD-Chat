@@ -58,6 +58,7 @@ public class ServerAgent extends Thread {
 					output.writeObject(clientInfo.getAuth());
 					PrintWriter pw2 = new PrintWriter(waitingAgent.getOutputStream(), true);
 					pw2.println(windowCount);
+
 					// send agent to customer
 					agent.setId(windowCount);// window count, for both windows different
 					windowCount++;
@@ -69,6 +70,7 @@ public class ServerAgent extends Thread {
 					// client to agent
 					BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
 					PrintWriter pw = new PrintWriter(agentSocket.getOutputStream(), true);
+					// TODO ending
 					while (true) {
 						String receivedId = br.readLine();
 						String receivedMsg = br.readLine();
