@@ -33,20 +33,17 @@ public class Server {
 		customerCount = 0;
 		connectionQueue = new ArrayBlockingQueue<ClientInfo>(5);
 		ServerSocket server = null;
-		ServerSocket server2 = null;
 		try {
 			try {
 				server = new ServerSocket(9999);
-				server2 = new ServerSocket(9998);
 
 				while (true) {
 					Socket client = server.accept();
 					System.out.println("Client connected with IP: " + client.getRemoteSocketAddress());
-					new AuthenticationHandler(client, server2);
+					new AuthenticationHandler(client);
 				}
 			} finally {
 				if (server != null) server.close();
-				if (server2 != null) server2.close();
 			}
 		} catch (Exception e) {
 			System.out.println("Server Error");
@@ -57,16 +54,14 @@ public class Server {
 	private class AuthenticationHandler extends Thread {
 
 		private Socket client;
-		private ServerSocket server2;
 		private int attemptsNumber;
 		private Calendar lastAttempt;
 
 		private static final int MAX_ATTEMPTS = 3;
 		private static final int BLOCKING_INTERVAL_MINS = 10;
 
-		public AuthenticationHandler(Socket client, ServerSocket server2) {
+		public AuthenticationHandler(Socket client) {
 			this.client = client;
-			this.server2 = server2;
 			attemptsNumber = 0;
 			lastAttempt = Calendar.getInstance();
 			start();
@@ -103,7 +98,7 @@ public class Server {
 							connectionQueue.put(clientInfo);
 						} else {
 							pw.println("1");
-							new ServerAgent(client, usr, server2);
+							new ServerAgent(client, usr);
 						}
 					} else if (attemptsNumber > MAX_ATTEMPTS) {
 						// too many attempts

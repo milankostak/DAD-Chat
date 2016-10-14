@@ -36,7 +36,7 @@ public class ClientCustomer extends Thread {
 		try {
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 			AuthWithWindowId agent = (AuthWithWindowId) ois.readObject();
-			System.out.println("Client received agent: " + agent.toString());
+			System.out.println("Customer received agent: " + agent.toString());
 			int agentWindowId = agent.getWindowId();
 			waitingWindow.setVisible(false);
 			CustomerGui gui = new CustomerGui(socket, "Customer: " + authCustomer.getUsername(), agentWindowId);

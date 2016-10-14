@@ -4,11 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
@@ -16,29 +17,68 @@ import my.edu.taylors.dad.chat.entity.ClientInfo;
 
 public class ServerAgent extends Thread {
 
-	private Socket waitingAgent;
 	private Map<Integer, Socket> customersMap = new HashMap<>();
 	private Auth agent;
 	private static int windowCount = 0;
-	
-	public ServerAgent(Socket agentSocket, Auth agent, ServerSocket server2) {
-		this.agent = agent;
 
-		try {
-			// always is going to be there, because agent just logged in
-			waitingAgent = server2.accept();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private ArrayBlockingQueue<AuthWithWindowId> queue = new ArrayBlockingQueue<AuthWithWindowId>(1);
+	
+	public ServerAgent(Socket agentSocket, Auth agent) {
+		this.agent = agent;
 
 		for (int i = 0; i < 2; i++) {
 			new ConnectionHandler(agentSocket, i);
+		}
+		new CustomerToAgentHandler(agentSocket);
+	}
+	
+	private class CustomerToAgentHandler extends Thread {
+		private Socket agentSocket;
+
+		public CustomerToAgentHandler(Socket agentSocket) {
+			this.agentSocket = agentSocket;
+			start();
+		}
+
+		@Override
+		public void run() {
+			// agent to customer
+			try {
+				BufferedReader brFromAgent = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
+				while (true) {
+					String clientId = brFromAgent.readLine();
+					if (clientId.equals("-3")) {
+						// new customer connected to agent
+						sendCustomerToAgent();
+					} else {
+						String receivedMsg = brFromAgent.readLine();
+
+						Socket client = customersMap.get(Integer.parseInt(clientId));
+						if (client != null && !client.isClosed()) {
+							PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
+							pwToCustomer.println(receivedMsg);
+						}
+					}
+				}
+			} catch (IOException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		private void sendCustomerToAgent() throws IOException, InterruptedException {
+			// send customer to agent, it will trigger opening window
+			AuthWithWindowId customer = queue.take();
+			ObjectOutputStream outputToAgent = new ObjectOutputStream(agentSocket.getOutputStream());
+			outputToAgent.writeObject(customer);
 		}
 	}
 	
 	private class ConnectionHandler extends Thread {
 		private ClientInfo clientInfo;
 		private Socket agentSocket;
+		private int tempWindowId;
+		private Socket client = null;
 
 		public ConnectionHandler(Socket agentSocket, int i) {
 			this.agentSocket = agentSocket;
@@ -48,41 +88,35 @@ public class ServerAgent extends Thread {
 		@Override
 		public void run() {
 			try {
-				Socket client = null;
 				try {
 					while (true) {
-						int tempWindowId = windowCount++;
+						tempWindowId = windowCount++;
 						clientInfo = Server.connectionQueue.take();
 						client = clientInfo.getSocket();
 						customersMap.put(clientInfo.getAuth().getId(), client);
-	
-						// send customer to agent
-						ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
-						AuthWithWindowId customerWId = new AuthWithWindowId(clientInfo.getAuth(), tempWindowId);
-						output.writeObject(customerWId);
-	
+
 						// send agent to customer
-						ObjectOutputStream output2 = new ObjectOutputStream(client.getOutputStream());
+						ObjectOutputStream outputToCustomer = new ObjectOutputStream(client.getOutputStream());
 						AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
-						output2.writeObject(agentWId);
+						outputToCustomer.writeObject(agentWId);
+
 	
-						setReceivingThread(client);
-	
-						// client to agent
-						BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
-						PrintWriter pw = new PrintWriter(agentSocket.getOutputStream(), true);
+						BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
+						PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
+						pwToAgent.println("-3");
+						queue.put(new AuthWithWindowId(clientInfo.getAuth(), tempWindowId));
 
 						// customer to agent
 						boolean keepReceiving = true;
 						while (keepReceiving) {
-							String receivedId = br.readLine();
-							String receivedMsg = br.readLine();
+							String receivedId = brFromCustomer.readLine();
+							String receivedMsg = brFromCustomer.readLine();
 							if (receivedId.equals("-1")) {
 								keepReceiving = false;
 								client.close();
 							} else {
-								pw.println(receivedId);
-								pw.println(receivedMsg);
+								pwToAgent.println(receivedId);
+								pwToAgent.println(receivedMsg);
 							}
 						}
 					}
@@ -93,32 +127,6 @@ public class ServerAgent extends Thread {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} 
-		}
-
-		private void setReceivingThread(Socket client) {
-			Thread thread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					// agent to customer
-					try {
-						BufferedReader br = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
-						while (true && !client.isClosed()) {
-							String clientId = br.readLine();
-							String receivedMsg = br.readLine();
-
-							Socket client = customersMap.get(Integer.parseInt(clientId));
-							if (client != null && !client.isClosed()) {
-								PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
-								pw.println(receivedMsg);
-							}
-						}
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
-			thread.start();
 		}
 	}
 }

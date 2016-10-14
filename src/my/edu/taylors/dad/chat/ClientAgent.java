@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +33,6 @@ public class ClientAgent extends Thread {
 		this.socket = socket;
 		this.agent = agent;
 		setupWaitingGui();
-		setReceivingThread();
 		start();
 	}
 
@@ -47,66 +48,51 @@ public class ClientAgent extends Thread {
 		}
 	}
 
-	// every client receives just in one thread a forward the message to correct window
-	private void setReceivingThread() {
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					keepReceiving = true;
-					while (keepReceiving) {
-						String id = fromServer.readLine();
-						String message = fromServer.readLine();
-						Message msg = new Message(message, ClientType.NOT_ME);
-						AgentGui agentGui = windows.get(Integer.parseInt(id));
-						if (agentGui != null) {
-							agentGui.addMessage(msg);
-						}
-					}
-				} catch (SocketException e) {
-					// throws when closing window, because it is waiting for server while we close the socket
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-		thread.start();
-	}
-
 	@Override
 	public void run() {
-		// this thread wait for server to tell that new customer was assigned to this agent
 		try {
-			Socket connectingSocket = null;
-			try {
-				connectingSocket = new Socket("127.0.0.1", 9998);
-				while (true) {
-					// get customer info
-					//System.out.println("Agent receiving customer info");
-					ObjectInputStream ios = new ObjectInputStream(connectingSocket.getInputStream());
-					AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
-					//TODO StreamCorruptedException when written two customers at server side
-					//System.out.println("customer " + customer.toString());
-
-					int clientId = customer.getId();
-					int windowId = customer.getWindowId();
-
-					AgentGui gui = new AgentGui(socket, "Agent: " + customer.getUsername(), clientId);
-					windows.put(windowId, gui);
-
-					gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));
-					
-					waitingFrame.setVisible(false);
+			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+			keepReceiving = true;
+			while (keepReceiving) {
+				String id = fromServer.readLine();
+				if (id.equals("-3")) {
+					getNewCustomer();
+				} else {
+					String message = fromServer.readLine();
+					Message msg = new Message(message, ClientType.NOT_ME);
+					AgentGui agentGui = windows.get(Integer.parseInt(id));
+					if (agentGui != null) {
+						agentGui.addMessage(msg);
+					}
 				}
-			} finally {
-				if (connectingSocket != null) connectingSocket.close();
 			}
-		} catch (ClassNotFoundException | IOException e) {
+		} catch (SocketException e) {
+			// throws when closing window, because it is waiting for server while we close the socket
+			e.printStackTrace();
+		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private void getNewCustomer() throws IOException, ClassNotFoundException {
+
+		PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+		writer.println("-3");
+		
+		ObjectInputStream ios = new ObjectInputStream(socket.getInputStream());
+		AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
+		System.out.println("Agent received customer: " + customer.toString());
+		//TODO StreamCorruptedException when written two customers at server side
+
+		int clientId = customer.getId();
+		int windowId = customer.getWindowId();
+
+		AgentGui gui = new AgentGui(socket, "Agent: " + customer.getUsername(), clientId);
+		windows.put(windowId, gui);
+
+		gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));
+		
+		waitingFrame.setVisible(false);
 	}
 }
