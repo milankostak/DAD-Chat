@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.gui.CustomerGui;
+import my.edu.taylors.dad.chat.gui.WaitingWindow;
 
 public class LoginMenu extends JFrame {
 	
@@ -121,12 +122,7 @@ public class LoginMenu extends JFrame {
 			switch (type) {
 				// Guest
 				case 0:
-					// get agent info
-					ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-					Auth agent = (Auth) ois.readObject();
-					int agentWindowId = agent.getId();
-
-					new CustomerGui(socket, "Customer: " + auth.getUsername(), agentWindowId);
+					new ClientCustomer(socket, auth);
 					this.setVisible(false);
 					break;
 
@@ -142,7 +138,7 @@ public class LoginMenu extends JFrame {
 					break;
 			}
 
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			if (socket != null) {
 				try {

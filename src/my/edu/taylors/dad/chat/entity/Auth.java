@@ -73,13 +73,14 @@ public class Auth implements Serializable {
 		}
 		return found;
 	}
-	
+
 	public Auth authenticate(Auth[] users) {
 		Auth found = null;
 		for (Auth user : users) {
 			if (found == null) {
 				if (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password)) {
-					found = user;
+					// because of reference to password
+					found = new Auth(user.username, user.password, user.type);
 					break;
 				}
 			}

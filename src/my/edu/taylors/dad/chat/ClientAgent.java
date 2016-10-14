@@ -6,10 +6,8 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -18,6 +16,7 @@ import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.AgentGui;
+import my.edu.taylors.dad.chat.gui.WaitingWindow;
 
 public class ClientAgent extends Thread {
 	
@@ -34,8 +33,8 @@ public class ClientAgent extends Thread {
 		start();
 	}
 	
-	private void setupWaitingGui() {
-		waitingFrame = new JFrame("Please wait");
+	private void setupWaitingGui() {		
+		waitingFrame = new WaitingWindow(" please wait for a client to connect");
 		waitingFrame.setVisible(true);
 	}
 	
