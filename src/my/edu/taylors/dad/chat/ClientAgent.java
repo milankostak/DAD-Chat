@@ -18,7 +18,7 @@ import my.edu.taylors.dad.chat.gui.AgentGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
 
 public class ClientAgent extends Thread {
-	
+
 	private JFrame waitingFrame;
 	private static Map<Integer, AgentGui> windows = new HashMap<>(2);
 	private boolean keepReceiving;
@@ -33,12 +33,19 @@ public class ClientAgent extends Thread {
 		setReceivingThread();
 		start();
 	}
-	
+
 	private void setupWaitingGui() {		
 		waitingFrame = new WaitingWindow(" please wait for a client to connect");
 		waitingFrame.setVisible(true);
 	}
 	
+	public static void sendBoth(String message) {
+		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
+			AgentGui gui = entry.getValue();
+			gui.showMessage(message);
+		}
+	}
+
 	// every client receives just in one thread a forward the message to correct window
 	private void setReceivingThread() {
 		Thread thread = new Thread(new Runnable() {

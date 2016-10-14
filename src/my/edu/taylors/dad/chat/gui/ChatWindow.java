@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import my.edu.taylors.dad.chat.ClientAgent;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 
@@ -111,13 +112,17 @@ public abstract class ChatWindow extends JFrame {
 		return bottomPanel;
 	}
 
-	private Object showMessageBoth() {
-		// TODO Auto-generated method stub
-		return null;
+	private void showMessageBoth() {
+		String message = tfMainInput.getText();
+		ClientAgent.sendBoth(message);
 	}
 
-	private void showMessage() {
+	public void showMessage() {
 		String message = tfMainInput.getText();
+		showMessage(message);
+	}
+
+	public void showMessage(String message) {
 		if (message.equals("")) {
 			return;
 		}

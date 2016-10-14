@@ -23,7 +23,7 @@ public class AgentGui extends ChatWindow {
 	}
 
 	@Override
-	protected void sendMessage(String message) {
+	public void sendMessage(String message) {
 		writer.println(otherSideId);
 		writer.println(message);
 		writer.flush();
