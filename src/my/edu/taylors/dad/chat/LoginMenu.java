@@ -30,6 +30,7 @@ public class LoginMenu extends JFrame {
 
 	private JTextField tfUsername;
 	private JPasswordField tfPassword;
+	private Socket socket = null;
 
 	public LoginMenu() {
 		setUpGui();
@@ -104,9 +105,8 @@ public class LoginMenu extends JFrame {
 
 	private void authenticate() {
 		Auth auth = getAuth();
-		Socket socket = null;
 		try {
-			socket = new Socket("127.0.0.1", 9999);
+			if (socket == null) socket = new Socket("127.0.0.1", 9999);
 
 			// send credentials to server for authentication
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
@@ -127,6 +127,11 @@ public class LoginMenu extends JFrame {
 				case 1:
 					new ClientAgent(socket, auth);
 					this.setVisible(false);
+					break;
+
+				// too many attempts
+				case -2:
+					JOptionPane.showOptionDialog(null, "You made too many attempts. Try again later.", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
 					break;
 
 				default:
