@@ -10,7 +10,6 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
@@ -24,8 +23,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.gui.CustomerGui;
-import my.edu.taylors.dad.chat.gui.WaitingWindow;
 
 public class LoginMenu extends JFrame {
 	
@@ -128,7 +125,7 @@ public class LoginMenu extends JFrame {
 
 				// Agent
 				case 1:
-					new ClientAgent(socket);
+					new ClientAgent(socket, auth);
 					this.setVisible(false);
 					break;
 

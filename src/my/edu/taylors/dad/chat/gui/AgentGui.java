@@ -5,6 +5,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import my.edu.taylors.dad.chat.entity.ClientType;
+
 public class AgentGui extends ChatWindow {
 	private static final long serialVersionUID = 1L;
 
@@ -14,7 +16,7 @@ public class AgentGui extends ChatWindow {
 	private int otherSideId;	
 
 	public AgentGui(Socket socket, String title, int otherSideId) {
-		super(title);
+		super(title, ClientType.AGENT);
 		this.socket = socket;
 		this.otherSideId = otherSideId;
 		setupWriter();

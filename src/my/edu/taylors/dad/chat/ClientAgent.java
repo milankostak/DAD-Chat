@@ -23,11 +23,13 @@ public class ClientAgent extends Thread {
 	private JFrame waitingFrame;
 	private static Map<Integer, AgentGui> windows = new HashMap<>(2);
 	private boolean keepReceiving;
+	private Auth agent;
 
 	private Socket socket;
 
-	public ClientAgent(Socket socket) {
+	public ClientAgent(Socket socket, Auth agent) {
 		this.socket = socket;
+		this.agent = agent;
 		setupWaitingGui();
 		setReceivingThread();
 		start();
@@ -83,7 +85,11 @@ public class ClientAgent extends Thread {
 					BufferedReader fromServer = new BufferedReader(new InputStreamReader(connectingSocket.getInputStream()));
 					String wId = fromServer.readLine();
 					int windowId = Integer.parseInt(wId);
-					windows.put(windowId, new AgentGui(socket, "Agent: " + customer.getUsername(), clientId));
+
+					AgentGui gui = new AgentGui(socket, "Agent: " + customer.getUsername(), clientId);
+					windows.put(windowId, gui);
+
+					gui.addMessage(new Message(new Date(), "Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));
 					
 					waitingFrame.setVisible(false);
 				}

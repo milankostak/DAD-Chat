@@ -22,7 +22,7 @@ public class CustomerGui extends ChatWindow {
 	private int otherSideId;	
 
 	public CustomerGui(Socket socket, String title, int otherSideId) {
-		super(title);
+		super(title, ClientType.CUSTOMER);
 		this.socket = socket;
 		this.otherSideId = otherSideId;
 		setupWriter();

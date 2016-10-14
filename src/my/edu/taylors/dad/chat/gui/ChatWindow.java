@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Date;
@@ -31,8 +32,10 @@ public abstract class ChatWindow extends JFrame {
 	private JTextField tfMainInput;
 	private ChatListModel chatListModel;
 	private JScrollBar vertical;
-	
-	public ChatWindow(String title) {
+	private ClientType clientType;
+
+	public ChatWindow(String title, ClientType clientType) {
+		this.clientType = clientType;
 		setUpGui(title);
 	}
 
@@ -90,10 +93,28 @@ public abstract class ChatWindow extends JFrame {
 		bottomLayout.setHgap(5);
 		JPanel bottomPanel = new JPanel(bottomLayout);
 		bottomPanel.add(tfMainInput, BorderLayout.CENTER);
-		bottomPanel.add(btSend, BorderLayout.EAST);
+		
+		if (clientType == ClientType.AGENT) {
+			JButton btSendBoth = new JButton("Send both");
+			btSendBoth.setMnemonic(KeyEvent.VK_B);
+			btSendBoth.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			btSendBoth.addActionListener(e -> showMessageBoth());
+			JPanel btPanel = new JPanel(new FlowLayout());
+			btPanel.add(btSend);
+			btPanel.add(btSendBoth);
+			bottomPanel.add(btPanel, BorderLayout.EAST);
+		} else {
+			bottomPanel.add(btSend, BorderLayout.EAST);
+		}
+		
 		bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 		return bottomPanel;
+	}
+
+	private Object showMessageBoth() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private void showMessage() {

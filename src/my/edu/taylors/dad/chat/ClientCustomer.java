@@ -3,10 +3,13 @@ package my.edu.taylors.dad.chat;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.Date;
 
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.CustomerGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
 
@@ -35,8 +38,8 @@ public class ClientCustomer extends Thread {
 			Auth agent = (Auth) ois.readObject();
 			int agentWindowId = agent.getId();
 			waitingWindow.setVisible(false);
-			// TODO agent.getusername()
-			new CustomerGui(socket, "Customer: " + authCustomer.getUsername(), agentWindowId);
+			CustomerGui gui = new CustomerGui(socket, "Customer: " + authCustomer.getUsername(), agentWindowId);
+			gui.addMessage(new Message(new Date(), "Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
