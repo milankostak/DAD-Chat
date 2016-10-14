@@ -52,7 +52,7 @@ public abstract class ChatWindow extends JFrame {
 		mainFrame.setLayout(mainLayout);
 		mainFrame.add(getMessagePanel(), BorderLayout.CENTER);
 		mainFrame.add(getBottomInputPanel(), BorderLayout.PAGE_END);
-		mainFrame.setMinimumSize(new Dimension(500, 400));
+		mainFrame.setMinimumSize(new Dimension(600, 500));
 
 		// basic settings and packing
 		mainFrame.setTitle(title);//TODO name

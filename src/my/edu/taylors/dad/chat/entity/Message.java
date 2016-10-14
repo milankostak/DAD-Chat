@@ -23,6 +23,10 @@ public class Message {
 		return time;
 	}
 
+	public String getFormattedTime() {
+		return prepareTime();
+	}
+
 	public void setTime(Date time) {
 		this.time = time;
 	}

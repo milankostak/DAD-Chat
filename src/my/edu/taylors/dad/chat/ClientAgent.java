@@ -42,7 +42,6 @@ public class ClientAgent extends Thread {
 	
 	public static void sendBoth(String message) {
 		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
-			System.out.println(entry.getKey());
 			AgentGui gui = entry.getValue();
 			gui.showMessage(message);
 		}
@@ -62,7 +61,7 @@ public class ClientAgent extends Thread {
 						Message msg = new Message(message, ClientType.NOT_ME);
 						AgentGui agentGui = windows.get(Integer.parseInt(id));
 						if (agentGui != null) {
-							windows.get(Integer.parseInt(id)).addMessage(msg);
+							agentGui.addMessage(msg);
 						}
 					}
 				} catch (SocketException e) {
@@ -86,11 +85,11 @@ public class ClientAgent extends Thread {
 				connectingSocket = new Socket("127.0.0.1", 9998);
 				while (true) {
 					// get customer info
-					System.out.println("Agent receiving customer info");
+					//System.out.println("Agent receiving customer info");
 					ObjectInputStream ios = new ObjectInputStream(connectingSocket.getInputStream());
 					AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
 					//TODO StreamCorruptedException when written two customers at server side
-					System.out.println("customer " + customer.toString());
+					//System.out.println("customer " + customer.toString());
 
 					int clientId = customer.getId();
 					int windowId = customer.getWindowId();
