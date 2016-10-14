@@ -13,14 +13,14 @@ import java.util.Map;
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
 
-public class Agent extends Thread {
+public class ServerAgent extends Thread {
 
 	private Socket waitingAgent;
 	private Map<Integer, Socket> customersMap = new HashMap<>();
 	private Auth agent;
 	private static int windowCount = 0;
 	
-	public Agent(Socket agentSocket, Auth agent, ServerSocket server2) {
+	public ServerAgent(Socket agentSocket, Auth agent, ServerSocket server2) {
 		this.agent = agent;
 
 		try {

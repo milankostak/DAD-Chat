@@ -12,7 +12,7 @@ import java.util.Date;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 
-public class ClientGui extends ChatWindow {
+public class CustomerGui extends ChatWindow {
 	private static final long serialVersionUID = 1L;
 
 	// communication components
@@ -21,7 +21,7 @@ public class ClientGui extends ChatWindow {
 	private boolean keepReceiving;
 	private int otherSideId;	
 
-	public ClientGui(Socket socket, String title, int otherSideId) {
+	public CustomerGui(Socket socket, String title, int otherSideId) {
 		super(title);
 		this.socket = socket;
 		this.otherSideId = otherSideId;

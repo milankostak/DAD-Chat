@@ -24,7 +24,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.gui.ClientGui;
+import my.edu.taylors.dad.chat.gui.CustomerGui;
 
 public class LoginMenu extends JFrame {
 	
@@ -126,7 +126,7 @@ public class LoginMenu extends JFrame {
 					Auth agent = (Auth) ois.readObject();
 					int agentWindowId = agent.getId();
 
-					new ClientGui(socket, "Customer: " + auth.getUsername(), agentWindowId);
+					new CustomerGui(socket, "Customer: " + auth.getUsername(), agentWindowId);
 					this.setVisible(false);
 					break;
 

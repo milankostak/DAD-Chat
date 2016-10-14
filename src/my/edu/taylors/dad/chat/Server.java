@@ -52,7 +52,7 @@ public class Server {
 							connectionQueue.put(clientInfo);
 						} else {
 							pw.println("1");
-							new Agent(client, usr, server2);
+							new ServerAgent(client, usr, server2);
 						}
 					} else {
 						// Wrong combination
