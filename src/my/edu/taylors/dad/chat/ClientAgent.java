@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +50,7 @@ public class ClientAgent extends Thread {
 					while (keepReceiving) {
 						String id = fromServer.readLine();
 						String message = fromServer.readLine();
-						Message msg = new Message(new Date(), message, ClientType.NOT_ME);
+						Message msg = new Message(message, ClientType.NOT_ME);
 						AgentGui agentGui = windows.get(Integer.parseInt(id));
 						if (agentGui != null) {
 							windows.get(Integer.parseInt(id)).addMessage(msg);
@@ -89,7 +88,7 @@ public class ClientAgent extends Thread {
 					AgentGui gui = new AgentGui(socket, "Agent: " + customer.getUsername(), clientId);
 					windows.put(windowId, gui);
 
-					gui.addMessage(new Message(new Date(), "Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));
+					gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));
 					
 					waitingFrame.setVisible(false);
 				}

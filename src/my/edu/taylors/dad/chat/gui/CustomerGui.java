@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Date;
 
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
@@ -45,7 +44,7 @@ public class CustomerGui extends ChatWindow {
 					keepReceiving = true;
 					while (keepReceiving) {
 						String message = fromServer.readLine();
-						Message msg = new Message(new Date(), message, ClientType.NOT_ME);
+						Message msg = new Message(message, ClientType.NOT_ME);
 						addMessage(msg);
 					}
 				} catch (SocketException e) {

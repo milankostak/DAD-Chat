@@ -9,6 +9,10 @@ public class Message {
 	private String message;
 	private ClientType clientType;
 
+	public Message(String message, ClientType clientType) {
+		this(new Date(), message, clientType);
+	}
+
 	public Message(Date time, String message, ClientType clientType) {
 		this.time = time;
 		this.message = message;

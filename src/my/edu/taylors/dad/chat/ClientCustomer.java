@@ -3,7 +3,6 @@ package my.edu.taylors.dad.chat;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.Date;
 
 import javax.swing.JFrame;
 
@@ -39,7 +38,7 @@ public class ClientCustomer extends Thread {
 			int agentWindowId = agent.getId();
 			waitingWindow.setVisible(false);
 			CustomerGui gui = new CustomerGui(socket, "Customer: " + authCustomer.getUsername(), agentWindowId);
-			gui.addMessage(new Message(new Date(), "Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));
+			gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

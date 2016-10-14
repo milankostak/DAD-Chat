@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -124,7 +123,7 @@ public abstract class ChatWindow extends JFrame {
 		}
 		tfMainInput.setText("");
 		
-		Message newMessage = new Message(new Date(), message, ClientType.ME);
+		Message newMessage = new Message(message, ClientType.ME);
 		
 		// show message
 		addMessage(newMessage);
