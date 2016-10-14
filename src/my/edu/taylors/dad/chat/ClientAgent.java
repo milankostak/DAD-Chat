@@ -14,18 +14,15 @@ public class ClientAgent extends Thread {
 	private JFrame waitingFrame;
 
 	private Socket socket;
-	//private byte connectedClients;
 
 	public ClientAgent(Socket socket) {
 		this.socket = socket;
-		//connectedClients = 0;
 		setupWaitingGui();
 		start();
 	}
 	
 	private void setupWaitingGui() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -36,12 +33,12 @@ public class ClientAgent extends Thread {
 			try {
 				connectingSocket = new Socket("127.0.0.1", 9998);
 				while (true) {
-					ObjectInputStream input = new ObjectInputStream(connectingSocket.getInputStream());
-					Auth auth = (Auth) input.readObject();
+					// get customer info
+					ObjectInputStream customer = new ObjectInputStream(connectingSocket.getInputStream());
+					Auth auth = (Auth) customer.readObject();
 					int id = auth.getId();
 
 					new ClientGui(socket, "Agent: " + auth.getUsername(), id);
-					//connectedClients++;
 					System.out.println(auth.getUsername());
 				}
 			} finally {

@@ -39,7 +39,6 @@ public class Agent extends Thread {
 		private Socket agentSocket;
 
 		public ConnectionHandler(Socket agentSocket, int i) {
-			System.out.println(agentSocket);
 			this.agentSocket = agentSocket;
 			start();
 		}
@@ -50,11 +49,16 @@ public class Agent extends Thread {
 				Socket client = null;
 				try {
 					clientInfo = Server.connectionQueue.take();
-
-					ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
-					output.writeObject(agent);
-					
 					client = clientInfo.getSocket();
+					customersMap.put(clientInfo.getAuth().getId(), client);
+
+					// send agent to client
+					ObjectOutputStream output = new ObjectOutputStream(waitingAgent.getOutputStream());
+					output.writeObject(clientInfo.getAuth());
+					// send client to agent
+					ObjectOutputStream output2 = new ObjectOutputStream(client.getOutputStream());
+					output2.writeObject(agent);
+					
 					setReceivingThread(client);
 					
 					//customersMap.put(ID, client);
@@ -86,11 +90,14 @@ public class Agent extends Thread {
 						BufferedReader br = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
 						while (true) {
 							String clientId = br.readLine();
+							System.out.println(clientId);
 							String receivedMsg = br.readLine();
 
 							Socket client = customersMap.get(Integer.parseInt(clientId));
-							PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
-							pw.println(receivedMsg);
+							if (client != null) {
+								PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
+								pw.println(receivedMsg);
+							}
 						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

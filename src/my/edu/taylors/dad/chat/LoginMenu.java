@@ -125,7 +125,7 @@ public class LoginMenu extends JFrame {
 					ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 					Auth agent = (Auth) ois.readObject();
 					int id = agent.getId();
-					System.out.println(agent);
+					System.out.println("Agent "+agent);
 					new ClientGui(socket, "Customer: " + auth.getUsername(), id);
 					this.setVisible(false);
 					break;

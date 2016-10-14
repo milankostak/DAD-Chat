@@ -23,6 +23,7 @@ public class Server {
 		ServerSocket server = null;
 		ServerSocket server2 = null;
 		int agentCount = 0;
+		int customerCount = 0;
 		try {
 			try {
 			server = new ServerSocket(9999);
@@ -40,6 +41,7 @@ public class Server {
 						// 1 - Agent, 0 - Guest
 						if (usr.getType() == 0) {
 							pw.println("0");
+							usr.setId(customerCount++);
 							ClientInfo clientInfo = new ClientInfo(usr, client);
 							connectionQueue.put(clientInfo);
 						} else {

@@ -15,7 +15,7 @@ public class Auth implements Serializable {
 	}
 
 	public Auth(String username, String password, int type) {
-		this(username, password, 0, 0);
+		this(username, password, type, 0);
 	}
 
 	public Auth(String username, String password, int type, int id) {
@@ -65,8 +65,10 @@ public class Auth implements Serializable {
 		boolean found = false;
 		for (Auth user : users) {
 			if (!found) {
-				if(user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password))
+				if (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password)) {
 					found = true;
+					break;
+				}
 			}
 		}
 		return found;
@@ -76,8 +78,10 @@ public class Auth implements Serializable {
 		Auth found = null;
 		for (Auth user : users) {
 			if (found == null) {
-				if (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password))
+				if (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password)) {
 					found = user;
+					break;
+				}
 			}
 		}
 		return found;
