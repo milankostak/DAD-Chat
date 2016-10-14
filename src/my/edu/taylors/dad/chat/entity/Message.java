@@ -5,8 +5,11 @@ import java.util.Date;
 
 public class Message {
 
+	// time of message, just for showing in GUI
 	private Date time;
+	// content of the message
 	private String message;
+	// who sent it, used for showing on either left or right side of chat window
 	private ClientType clientType;
 
 	public Message(String message, ClientType clientType) {
@@ -52,6 +55,10 @@ public class Message {
 		return prepareTime() + "  " + message;
 	}
 	
+	/**
+	 * Format for showing date, want just hour and minute
+	 * @return formatted time
+	 */
 	private String prepareTime() {
 		return new SimpleDateFormat("HH:mm").format(time);
 	}

@@ -45,7 +45,7 @@ public class CustomerGui extends ChatWindow {
 					BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					keepReceiving = true;
 					while (keepReceiving) {
-						if(fromServer.ready()){
+						if (fromServer.ready()) {
 							String message = fromServer.readLine();
 							Message msg = new Message(message, ClientType.NOT_ME);
 							addMessage(msg);

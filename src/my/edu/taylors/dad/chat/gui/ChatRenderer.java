@@ -14,6 +14,9 @@ import javax.swing.ListCellRenderer;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 
+/**
+ * Custom chat window renderer to show message in nicer way
+ */
 public class ChatRenderer implements ListCellRenderer<Message> {
 
 	@Override
@@ -42,16 +45,14 @@ public class ChatRenderer implements ListCellRenderer<Message> {
 		lbMessage.setOpaque(true);
 		lbMessage.setBackground(color);
 		final int border = 6;
-        lbMessage.setBorder(BorderFactory.createEmptyBorder(border, border, border, border));
+		lbMessage.setBorder(BorderFactory.createEmptyBorder(border, border, border, border));
 
 		JLabel lbTime = new JLabel(value.getFormattedTime());
 		lbTime.setOpaque(true);
 		lbTime.setBackground(color2);
 		lbTime.setBorder(BorderFactory.createEmptyBorder(border, border, border, border));
-
 		lbTime.setFont(new Font(lbTime.getFont().getFontName(), Font.PLAIN, 10));
-		
-		
+
 		messagePanel.add(lbTime);
 		messagePanel.add(lbMessage);
 
