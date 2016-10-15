@@ -1,5 +1,6 @@
 package my.edu.taylors.dad.chat.gui;
 
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -69,6 +70,7 @@ public class AgentGui extends ChatWindow {
 		disableControls();
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		saveConversation();
+		this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 	}
 
 	public void saveConversation() {

@@ -1,5 +1,6 @@
 package my.edu.taylors.dad.chat.gui;
 
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -93,6 +94,9 @@ public class CustomerGui extends ChatWindow {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		try {
 			socket.close();
+			//Close after logging out
+			this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
