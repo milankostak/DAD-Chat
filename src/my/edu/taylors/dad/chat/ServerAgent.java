@@ -31,13 +31,13 @@ public class ServerAgent extends Thread {
 		for (int i = 0; i < 2; i++) {
 			new ConnectionHandler(agentSocket, i);
 		}
-		new CustomerToAgentHandler(agentSocket);
+		new AgentToCustomerHandler(agentSocket);
 	}
 	
-	private class CustomerToAgentHandler extends Thread {
+	private class AgentToCustomerHandler extends Thread {
 		private Socket agentSocket;
 
-		public CustomerToAgentHandler(Socket agentSocket) {
+		public AgentToCustomerHandler(Socket agentSocket) {
 			this.agentSocket = agentSocket;
 			start();
 		}
@@ -48,31 +48,35 @@ public class ServerAgent extends Thread {
 			try {
 				BufferedReader brFromAgent = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
 				while (true) {
-					String clientId = brFromAgent.readLine();
-					if (clientId.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
-						// new customer connected to agent
-						sendCustomerToAgent();
-					} else if (clientId.equals(Flags.LOGOUT)) {
-						String messageWithId = brFromAgent.readLine();
-						int id = Integer.parseInt(messageWithId);
-						Socket client = customersMap.get(id);
-						PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
-						pwToCustomer.println(Flags.LOGOUT);
-						client.close();
-						customersMap.remove(id);
-					} else {
-						String receivedMsg = brFromAgent.readLine();
+					try {
 
-						Socket client = customersMap.get(Integer.parseInt(clientId));
-						if (client != null && !client.isClosed()) {
+						String clientId = brFromAgent.readLine();
+						if (clientId.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
+							// new customer connected to agent
+							sendCustomerToAgent();
+						} else if (clientId.equals(Flags.LOGOUT)) {
+							String messageWithId = brFromAgent.readLine();
+							int id = Integer.parseInt(messageWithId);
+							Socket client = customersMap.get(id);
 							PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
-							pwToCustomer.println(Flags.NOTHING);
-							pwToCustomer.println(receivedMsg);
+							pwToCustomer.println(Flags.LOGOUT);
+							client.close();
+							customersMap.remove(id);
+						} else {
+							String receivedMsg = brFromAgent.readLine();
+
+							Socket client = customersMap.get(Integer.parseInt(clientId));
+							if (client != null && !client.isClosed()) {
+								PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
+								pwToCustomer.println(Flags.NOTHING);
+								pwToCustomer.println(receivedMsg);
+							}
 						}
+					} catch (SocketException e) {
+						System.err.println("Client disconnected");
 					}
 				}
 			} catch (IOException | InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

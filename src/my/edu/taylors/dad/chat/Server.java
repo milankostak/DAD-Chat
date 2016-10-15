@@ -95,7 +95,6 @@ public class Server {
 						usr.setPassword("");
 						failed = false;
 
-						// 1 - Agent, 0 - Guest
 						if (usr.getType() == 0) {
 							pw.println(Flags.CUSTOMER_AUTHENTICATED);
 							usr.setId(customerCount++);

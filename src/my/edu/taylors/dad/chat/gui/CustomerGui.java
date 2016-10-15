@@ -59,7 +59,6 @@ public class CustomerGui extends ChatWindow {
 				} catch (SocketException e) {
 					System.err.println("Customer disconnected");
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

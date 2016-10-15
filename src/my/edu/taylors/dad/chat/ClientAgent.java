@@ -23,7 +23,7 @@ import my.edu.taylors.dad.chat.gui.WaitingWindow;
 public class ClientAgent extends Thread {
 
 	private JFrame waitingFrame;
-	private static Map<Integer, AgentGui> windows = new HashMap<>(2);
+	public static Map<Integer, AgentGui> windows = new HashMap<>(2);
 	private boolean keepReceiving;
 	private Auth agent;
 
@@ -72,10 +72,8 @@ public class ClientAgent extends Thread {
 			}
 			
 		} catch (SocketException e) {
-			// throws when closing window, because it is waiting for server while we close the socket
 			e.printStackTrace();
 		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -84,12 +82,14 @@ public class ClientAgent extends Thread {
 		int customerIdInt = Integer.parseInt(customerId);
 		AgentGui agentGui = windows.get(customerIdInt);
 		if (agentGui != null) {
-
 			agentGui.logOut(new Message("Customer ended conversation", ClientType.NOT_ME));
-			windows.remove(customerIdInt);
-			if (windows.size() == 0) {
-				waitingFrame.setVisible(true);
-			}
+		}
+	}
+	
+	public void removeWindow(int customerIdInt) {
+		windows.remove(customerIdInt);
+		if (windows.size() == 0) {
+			waitingFrame.setVisible(true);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class ClientAgent extends Thread {
 		int clientId = customer.getId();
 		int windowId = customer.getWindowId();
 
-		AgentGui gui = new AgentGui(socket, customer.getUsername(), clientId, agent.getUsername());
+		AgentGui gui = new AgentGui(this, socket, customer.getUsername(), clientId, agent.getUsername());
 		windows.put(windowId, gui);
 
 		gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));

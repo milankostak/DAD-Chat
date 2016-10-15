@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import my.edu.taylors.dad.chat.ClientAgent;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
@@ -23,11 +24,13 @@ public class AgentGui extends ChatWindow {
 	private Socket socket;
 	private PrintWriter writer;
 	private int clientId;
+	private ClientAgent clientAgent;
 	
 	private String customerName, agentName;
 
-	public AgentGui(Socket socket, String customerName, int clientId, String agentName) {
+	public AgentGui(ClientAgent clientAgent, Socket socket, String customerName, int clientId, String agentName) {
 		super("Agent: conversation with customer " + customerName, ClientType.AGENT);
+		this.clientAgent = clientAgent;
 		this.socket = socket;
 		this.customerName = customerName;
 		this.clientId = clientId;
@@ -49,7 +52,6 @@ public class AgentGui extends ChatWindow {
 		try {
 			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -70,6 +72,7 @@ public class AgentGui extends ChatWindow {
 		disableControls();
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		saveConversation();
+		clientAgent.removeWindow(clientId);
 		this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 	}
 
