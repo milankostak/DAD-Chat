@@ -17,7 +17,7 @@ import my.edu.taylors.dad.chat.entity.ClientInfo;
 
 public class ServerAgent extends Thread {
 
-	private Map<Integer, Socket> customersMap = new HashMap<>();
+	private Map<Integer, Socket> customersMap = new HashMap<>(2);
 	private Auth agent;
 	private static int windowCount = 0;
 
@@ -69,6 +69,7 @@ public class ServerAgent extends Thread {
 		private void sendCustomerToAgent() throws IOException, InterruptedException {
 			// send customer to agent, it will trigger opening window
 			AuthWithWindowId customer = queue.take();
+			System.out.println("Sending customer to agent: " + customer.toString());
 			ObjectOutputStream outputToAgent = new ObjectOutputStream(agentSocket.getOutputStream());
 			outputToAgent.writeObject(customer);
 		}
@@ -100,7 +101,6 @@ public class ServerAgent extends Thread {
 						AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
 						outputToCustomer.writeObject(agentWId);
 
-	
 						BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
 						PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
 						pwToAgent.println("-3");

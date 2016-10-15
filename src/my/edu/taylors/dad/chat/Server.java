@@ -46,7 +46,7 @@ public class Server {
 				if (server != null) server.close();
 			}
 		} catch (Exception e) {
-			System.out.println("Server Error");
+			System.err.println("Server Error");
 			e.printStackTrace();
 		}
 	}
@@ -109,7 +109,7 @@ public class Server {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("Server Error");
+				System.err.println("Server Error");
 				e.printStackTrace();
 			}
 		}

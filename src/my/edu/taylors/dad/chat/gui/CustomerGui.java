@@ -45,11 +45,12 @@ public class CustomerGui extends ChatWindow {
 					BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					keepReceiving = true;
 					while (keepReceiving) {
-						if (fromServer.ready()) {
+						// cannot be here creates, infinite loop, because the condition is not usually met
+						//if (fromServer.ready()) {
 							String message = fromServer.readLine();
 							Message msg = new Message(message, ClientType.NOT_ME);
 							addMessage(msg);
-						}
+						//}
 					}
 				} catch (SocketException e) {
 					// throws when closing window, because it is waiting for server while we close the socket

@@ -7,7 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ public class ClientAgent extends Thread {
 	}
 
 	private void setupWaitingGui() {		
-		waitingFrame = new WaitingWindow(" please wait for a client to connect");
+		waitingFrame = new WaitingWindow(" Please wait for a client to connect.");
 		waitingFrame.setVisible(true);
 	}
 	
@@ -51,7 +50,8 @@ public class ClientAgent extends Thread {
 	@Override
 	public void run() {
 		try {
-			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+			// customer to agent
+			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			keepReceiving = true;
 			while (keepReceiving) {
 				String id = fromServer.readLine();
