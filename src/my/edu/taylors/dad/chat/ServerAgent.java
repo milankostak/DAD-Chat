@@ -126,7 +126,7 @@ public class ServerAgent extends Thread {
 							boolean keepReceiving = true;
 							while (keepReceiving) {
 								String receivedId = brFromCustomer.readLine();
-								if (receivedId.equals(Flags.LOGOUT)) {
+								if (receivedId != null && receivedId.equals(Flags.LOGOUT)) {
 									keepReceiving = false;
 									pwToAgent.println(Flags.LOGOUT);
 									String id2 = brFromCustomer.readLine();
