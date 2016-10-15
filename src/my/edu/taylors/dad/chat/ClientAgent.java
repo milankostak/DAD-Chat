@@ -70,6 +70,7 @@ public class ClientAgent extends Thread {
 					}
 				}
 			}
+			
 		} catch (SocketException e) {
 			// throws when closing window, because it is waiting for server while we close the socket
 			e.printStackTrace();
@@ -86,7 +87,9 @@ public class ClientAgent extends Thread {
 
 			agentGui.logOut(new Message("Customer ended conversation", ClientType.NOT_ME));
 			windows.remove(customerIdInt);
-			// TODO when closed last, app ends
+			if (windows.size() == 0) {
+				waitingFrame.setVisible(true);
+			}
 		}
 	}
 

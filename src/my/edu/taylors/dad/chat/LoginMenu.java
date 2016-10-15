@@ -107,7 +107,7 @@ public class LoginMenu extends JFrame {
 	private void authenticate() {
 		Auth auth = getAuth();
 		try {
-			if (socket == null) socket = new Socket("127.0.0.1", 9999);
+			if (socket == null) socket = new Socket("192.168.9.116", 9999);
 
 			// send credentials to server for authentication
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());

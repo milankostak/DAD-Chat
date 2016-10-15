@@ -57,8 +57,7 @@ public class CustomerGui extends ChatWindow {
 						}
 					}
 				} catch (SocketException e) {
-					// throws when closing window, because it is waiting for server while we close the socket
-					e.printStackTrace();
+					System.err.println("Customer disconnected");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

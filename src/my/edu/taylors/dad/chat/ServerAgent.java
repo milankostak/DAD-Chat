@@ -53,7 +53,6 @@ public class ServerAgent extends Thread {
 						// new customer connected to agent
 						sendCustomerToAgent();
 					} else if (clientId.equals(Flags.LOGOUT)) {
-						//keepReceiving = false;
 						String messageWithId = brFromAgent.readLine();
 						int id = Integer.parseInt(messageWithId);
 						Socket client = customersMap.get(id);
@@ -61,9 +60,6 @@ public class ServerAgent extends Thread {
 						pwToCustomer.println(Flags.LOGOUT);
 						client.close();
 						customersMap.remove(id);
-						if (customersMap.size() == 0) {
-							// TODO
-						}
 					} else {
 						String receivedMsg = brFromAgent.readLine();
 
@@ -140,7 +136,7 @@ public class ServerAgent extends Thread {
 								}
 							}
 						} catch(SocketException e) {
-							e.printStackTrace();
+							System.err.println("Customer disconnected");
 						}
 					}// while (true)
 				} finally {
