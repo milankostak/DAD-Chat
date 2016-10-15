@@ -7,8 +7,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -59,7 +57,7 @@ public abstract class ChatWindow extends JFrame {
 	 * This method is called to finish logging out<br>
 	 * Can be invoked from other side (agent, customer) to perform log out
 	 */
-	public abstract void logOut();
+	public abstract void logOut(Message message);
 
 	/**
 	 * Uses writer to send message to server

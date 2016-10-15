@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
+import javax.swing.JFrame;
+
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
@@ -44,9 +46,14 @@ public class CustomerGui extends ChatWindow {
 				try {
 					BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					while (!isLoggingOut()) {
-						String message = fromServer.readLine();
-						Message msg = new Message(message, ClientType.NOT_ME);
-						addMessage(msg);
+						String flag = fromServer.readLine();
+						if (flag != null && flag.equals(Flags.LOGOUT)) {
+							logOut(new Message("Agent ended the conversation", ClientType.NOT_ME));
+						} else {
+							String message = fromServer.readLine();
+							Message msg = new Message(message, ClientType.NOT_ME);
+							addMessage(msg);
+						}
 					}
 				} catch (SocketException e) {
 					// throws when closing window, because it is waiting for server while we close the socket
@@ -75,19 +82,19 @@ public class CustomerGui extends ChatWindow {
 		writer.println(Flags.LOGOUT);
 		writer.println(otherSideId);
 		writer.flush();
-		logOut();
+		logOut(new Message("Customer ended the conversation", ClientType.ME));
 	}
 
 	@Override
-	public void logOut() {
-		//setLoggingOut(true);
-		this.setVisible(false);
+	public void logOut(Message message) {
+		setLoggingOut(true);
+		addMessage(message);
+		disableControls();
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		try {
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			System.exit(1);
 		}
 	}
 

@@ -83,14 +83,9 @@ public class ClientAgent extends Thread {
 		int customerIdInt = Integer.parseInt(customerId);
 		AgentGui agentGui = windows.get(customerIdInt);
 		if (agentGui != null) {
-			// show message and log out
-			agentGui.addMessage(new Message("Customer ended conversation", ClientType.NOT_ME));
-			agentGui.logOut();
-			agentGui.saveConversation();
-			agentGui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			
+
+			agentGui.logOut(new Message("Customer ended conversation", ClientType.NOT_ME));
 			windows.remove(customerIdInt);
-			// TODO save conversation
 			// TODO when closed last, app ends
 		}
 	}
@@ -107,7 +102,7 @@ public class ClientAgent extends Thread {
 		int clientId = customer.getId();
 		int windowId = customer.getWindowId();
 
-		AgentGui gui = new AgentGui(socket, "Agent: " + customer.getUsername(), clientId);
+		AgentGui gui = new AgentGui(socket, customer.getUsername(), clientId, agent.getUsername());
 		windows.put(windowId, gui);
 
 		gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));

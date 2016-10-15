@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -51,13 +52,25 @@ public class ServerAgent extends Thread {
 					if (clientId.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
 						// new customer connected to agent
 						sendCustomerToAgent();
+					} else if (clientId.equals(Flags.LOGOUT)) {
+						//keepReceiving = false;
+						String messageWithId = brFromAgent.readLine();
+						int id = Integer.parseInt(messageWithId);
+						Socket client = customersMap.get(id);
+						PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
+						pwToCustomer.println(Flags.LOGOUT);
+						client.close();
+						customersMap.remove(id);
+						if (customersMap.size() == 0) {
+							// TODO
+						}
 					} else {
 						String receivedMsg = brFromAgent.readLine();
 
 						Socket client = customersMap.get(Integer.parseInt(clientId));
-						System.out.println("Map size1: " + customersMap.size());
 						if (client != null && !client.isClosed()) {
 							PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
+							pwToCustomer.println(Flags.NOTHING);
 							pwToCustomer.println(receivedMsg);
 						}
 					}
@@ -93,47 +106,48 @@ public class ServerAgent extends Thread {
 			try {
 				try {
 					while (true) {
-						tempWindowId = windowCount++;
-						clientInfo = Server.connectionQueue.take();
-						client = clientInfo.getSocket();
-						customersMap.put(clientInfo.getAuth().getId(), client);
-						System.out.println("Map size2: " + customersMap.size());
-
-						// send agent to customer
-						ObjectOutputStream outputToCustomer = new ObjectOutputStream(client.getOutputStream());
-						AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
-						outputToCustomer.writeObject(agentWId);
-
-						BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
-						PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
-						pwToAgent.println(Flags.SENDING_CUSTOMER_TO_AGENT);
-						queue.put(new AuthWithWindowId(clientInfo.getAuth(), tempWindowId));
-
-						// customer to agent
-						boolean keepReceiving = true;
-						while (keepReceiving) {
-							String receivedId = brFromCustomer.readLine();
-							if (receivedId.equals(Flags.LOGOUT)) {
-								keepReceiving = false;
-								pwToAgent.println(Flags.LOGOUT);
-								String id2 = brFromCustomer.readLine();
-								pwToAgent.println(id2);
-								client.close();
-								customersMap.remove(clientInfo.getAuth().getId());
-								System.out.println("Map size3: " + customersMap.size());
-							} else {
-								String receivedMsg = brFromCustomer.readLine();
-								pwToAgent.println(receivedId);
-								pwToAgent.println(receivedMsg);
+						try {
+							tempWindowId = windowCount++;
+							clientInfo = Server.connectionQueue.take();
+							client = clientInfo.getSocket();
+							customersMap.put(clientInfo.getAuth().getId(), client);
+	
+							// send agent to customer
+							ObjectOutputStream outputToCustomer = new ObjectOutputStream(client.getOutputStream());
+							AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
+							outputToCustomer.writeObject(agentWId);
+	
+							BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
+							PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
+							pwToAgent.println(Flags.SENDING_CUSTOMER_TO_AGENT);
+							queue.put(new AuthWithWindowId(clientInfo.getAuth(), tempWindowId));
+	
+							// customer to agent
+							boolean keepReceiving = true;
+							while (keepReceiving) {
+								String receivedId = brFromCustomer.readLine();
+								if (receivedId.equals(Flags.LOGOUT)) {
+									keepReceiving = false;
+									pwToAgent.println(Flags.LOGOUT);
+									String id2 = brFromCustomer.readLine();
+									pwToAgent.println(id2);
+									client.close();
+									customersMap.remove(clientInfo.getAuth().getId());
+								} else {
+									String receivedMsg = brFromCustomer.readLine();
+									pwToAgent.println(receivedId);
+									pwToAgent.println(receivedMsg);
+								}
 							}
+						} catch(SocketException e) {
+							e.printStackTrace();
 						}
-					}
+					}// while (true)
 				} finally {
 					if (client != null) client.close();
 				}
-			} catch (IOException | InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
 			} 
 		}
 	}
