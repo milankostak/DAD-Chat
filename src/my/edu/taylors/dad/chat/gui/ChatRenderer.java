@@ -25,8 +25,6 @@ public class ChatRenderer implements ListCellRenderer<Message> {
 
 		FlowLayout layout = new FlowLayout();
 		JPanel messagePanel = new JPanel(layout);
-		//int width = (int)(list.getWidth() * 0.8);
-		//messagePanel.setMaximumSize(new Dimension(width, 20));
 		messagePanel.setOpaque(true);
 		messagePanel.setBackground(Color.WHITE);
 

@@ -24,7 +24,7 @@ public class ServerAgent extends Thread {
 	private static int windowCount = 0;
 
 	private ArrayBlockingQueue<AuthWithWindowId> queue = new ArrayBlockingQueue<AuthWithWindowId>(1);
-	
+
 	public ServerAgent(Socket agentSocket, Auth agent) {
 		this.agent = agent;
 
@@ -33,7 +33,7 @@ public class ServerAgent extends Thread {
 		}
 		new AgentToCustomerHandler(agentSocket);
 	}
-	
+
 	private class AgentToCustomerHandler extends Thread {
 		private Socket agentSocket;
 

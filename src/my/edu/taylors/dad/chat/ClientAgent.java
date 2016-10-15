@@ -85,7 +85,7 @@ public class ClientAgent extends Thread {
 			agentGui.logOut(new Message("Customer ended conversation", ClientType.NOT_ME));
 		}
 	}
-	
+
 	public void removeWindow(int customerIdInt) {
 		windows.remove(customerIdInt);
 		if (windows.size() == 0) {

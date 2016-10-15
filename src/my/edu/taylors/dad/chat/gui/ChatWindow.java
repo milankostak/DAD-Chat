@@ -81,12 +81,6 @@ public abstract class ChatWindow extends JFrame {
 		// basic settings and packing
 		mainFrame.setTitle(title);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-//		mainFrame.addWindowListener(new WindowAdapter() {
-//		    public void windowClosing(WindowEvent e) {
-//		    	mainFrame.setExtendedState(JFrame.ICONIFIED);
-//		    }
-//		});
-		//mainFrame.addWindowListener(new CustomExitWindowListener());
 		mainFrame.pack();
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
