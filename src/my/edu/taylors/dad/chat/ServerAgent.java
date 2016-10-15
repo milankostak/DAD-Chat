@@ -47,7 +47,8 @@ public class ServerAgent extends Thread {
 			// agent to customer
 			try {
 				BufferedReader brFromAgent = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
-				while (true) {
+				boolean keepRunning = true;
+				while (keepRunning) {
 					try {
 
 						String clientId = brFromAgent.readLine();
@@ -73,7 +74,8 @@ public class ServerAgent extends Thread {
 							}
 						}
 					} catch (SocketException e) {
-						System.err.println("Client disconnected");
+						keepRunning = false;
+						System.err.println("Agent disconnected");
 					}
 				}
 			} catch (IOException | InterruptedException e) {

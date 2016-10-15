@@ -1,5 +1,6 @@
 package my.edu.taylors.dad.chat;
 
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -83,6 +84,9 @@ public class ClientAgent extends Thread {
 		AgentGui agentGui = windows.get(customerIdInt);
 		if (agentGui != null) {
 			agentGui.logOut(new Message("Customer ended conversation", ClientType.NOT_ME));
+			agentGui.dispatchEvent(new WindowEvent(agentGui, WindowEvent.WINDOW_CLOSING));
+			agentGui.dispose();
+			agentGui = null;
 		}
 	}
 
