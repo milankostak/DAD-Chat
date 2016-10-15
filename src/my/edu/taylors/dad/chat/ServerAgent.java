@@ -55,6 +55,7 @@ public class ServerAgent extends Thread {
 						String receivedMsg = brFromAgent.readLine();
 
 						Socket client = customersMap.get(Integer.parseInt(clientId));
+						System.out.println("Map size1: " + customersMap.size());
 						if (client != null && !client.isClosed()) {
 							PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
 							pwToCustomer.println(receivedMsg);
@@ -96,6 +97,7 @@ public class ServerAgent extends Thread {
 						clientInfo = Server.connectionQueue.take();
 						client = clientInfo.getSocket();
 						customersMap.put(clientInfo.getAuth().getId(), client);
+						System.out.println("Map size2: " + customersMap.size());
 
 						// send agent to customer
 						ObjectOutputStream outputToCustomer = new ObjectOutputStream(client.getOutputStream());
@@ -111,11 +113,16 @@ public class ServerAgent extends Thread {
 						boolean keepReceiving = true;
 						while (keepReceiving) {
 							String receivedId = brFromCustomer.readLine();
-							String receivedMsg = brFromCustomer.readLine();
-							if (receivedId.equals(Flags.CLIENT_LOGOUT)) {
+							if (receivedId.equals(Flags.LOGOUT)) {
 								keepReceiving = false;
+								pwToAgent.println(Flags.LOGOUT);
+								String id2 = brFromCustomer.readLine();
+								pwToAgent.println(id2);
 								client.close();
+								customersMap.remove(clientInfo.getAuth().getId());
+								System.out.println("Map size3: " + customersMap.size());
 							} else {
+								String receivedMsg = brFromCustomer.readLine();
 								pwToAgent.println(receivedId);
 								pwToAgent.println(receivedMsg);
 							}

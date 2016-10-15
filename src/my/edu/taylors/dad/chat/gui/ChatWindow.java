@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -30,12 +32,16 @@ public abstract class ChatWindow extends JFrame {
 	// GUI components
 	private JFrame mainFrame;
 	private JTextField tfMainInput;
+	private JButton btSendBoth, btSend, btLogOut;
 	private ChatListModel chatListModel;
 	private JScrollBar vertical;
 	private ClientType clientType;
 
+	private boolean isLoggingOut;
+
 	public ChatWindow(String title, ClientType clientType) {
 		this.clientType = clientType;
+		this.isLoggingOut = false;
 		setUpGui(title);
 	}
 
@@ -45,9 +51,15 @@ public abstract class ChatWindow extends JFrame {
 	protected abstract void setupWriter();
 
 	/**
-	 * This method is called when user clicks log out button
+	 * This method invokes log out on both sides (customer, agent), called when user clicks button
 	 */
-	protected abstract void logOut();
+	protected abstract void invokeLogOut();
+
+	/**
+	 * This method is called to finish logging out<br>
+	 * Can be invoked from other side (agent, customer) to perform log out
+	 */
+	public abstract void logOut();
 
 	/**
 	 * Uses writer to send message to server
@@ -70,17 +82,20 @@ public abstract class ChatWindow extends JFrame {
 
 		// basic settings and packing
 		mainFrame.setTitle(title);
-		//TODO closing
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+//		mainFrame.addWindowListener(new WindowAdapter() {
+//		    public void windowClosing(WindowEvent e) {
+//		    	mainFrame.setExtendedState(JFrame.ICONIFIED);
+//		    }
+//		});
 		//mainFrame.addWindowListener(new CustomExitWindowListener());
-
 		mainFrame.pack();
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 	}
 
 	/**
-	 * Creates component displaying chat messages
+	 * Creates component displaying chat messages<br>
 	 * Based on {@link JList} with custom cell renderer and custom model
 	 * @return GUi component for showing messages
 	 */
@@ -109,7 +124,7 @@ public abstract class ChatWindow extends JFrame {
 		tfMainInput = new JTextField();
 		tfMainInput.addKeyListener(new MainInputKeyAdapter());
 
-		JButton btSend = new JButton("Send");
+		btSend = new JButton("Send");
 		btSend.setMnemonic(KeyEvent.VK_S);
 		btSend.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btSend.addActionListener(e -> showMessage());
@@ -123,17 +138,17 @@ public abstract class ChatWindow extends JFrame {
 		btPanel.add(btSend);
 		
 		if (clientType == ClientType.AGENT) {
-			JButton btSendBoth = new JButton("Send both");
+			btSendBoth = new JButton("Send both");
 			btSendBoth.setMnemonic(KeyEvent.VK_B);
 			btSendBoth.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			btSendBoth.addActionListener(e -> showMessageBoth());
 			btPanel.add(btSendBoth);
 		}
 
-		JButton btLogOut = new JButton("Log Out");
+		btLogOut = new JButton("Log Out");
 		btLogOut.setMnemonic(KeyEvent.VK_L);
 		btLogOut.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btLogOut.addActionListener(e -> logOut());
+		btLogOut.addActionListener(e -> invokeLogOut());
 		btPanel.add(btLogOut);
 
 		bottomPanel.add(btPanel, BorderLayout.EAST);
@@ -187,6 +202,13 @@ public abstract class ChatWindow extends JFrame {
 		scrollDown();
 	}
 	
+	protected void disableControls() {
+		btSend.setEnabled(false);
+		btLogOut.setEnabled(false);
+		if (btSendBoth != null) btSendBoth.setEnabled(false);
+		tfMainInput.setEnabled(false);
+	}
+	
 	/**
 	 * Scroll down the chat window to see the newest messages
 	 */
@@ -194,6 +216,21 @@ public abstract class ChatWindow extends JFrame {
 		vertical.setValue(vertical.getMaximum());
 	}
 
+	public boolean isLoggingOut() {
+		return isLoggingOut;
+	}
+
+	public void setLoggingOut(boolean isLoggingOut) {
+		this.isLoggingOut = isLoggingOut;
+	}
+
+	public ChatListModel getChatListModel() {
+		return chatListModel;
+	}
+
+	/**
+	 * Key adapter for listening for Enter key, which also sends current message
+	 */
 	private class MainInputKeyAdapter extends KeyAdapter {
 		public void keyReleased(KeyEvent e) {
 			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -201,24 +238,5 @@ public abstract class ChatWindow extends JFrame {
 			}
 		}
 	}
-	
-	/*private class CustomExitWindowListener extends WindowAdapter {
 
-	    @Override
-	    public void windowClosing(WindowEvent event) {
-	        keepReceiving = false;
-	        if (socket != null) {
-				try {
-					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-	        }
-	        WindowEvent wev = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
-	        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
-	        mainFrame.setVisible(false);
-	        mainFrame.dispose();
-	        System.exit(0);
-	    }
-	};*/
 }

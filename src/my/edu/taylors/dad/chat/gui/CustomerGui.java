@@ -18,40 +18,35 @@ public class CustomerGui extends ChatWindow {
 	// communication components
 	private Socket socket;
 	private PrintWriter writer;
-	private boolean keepReceiving;
-	private int otherSideId;	
-	
-	private Thread thread;
+	private int otherSideId;
 
 	public CustomerGui(Socket socket, String title, int otherSideId) {
 		super(title, ClientType.CUSTOMER);
 		this.socket = socket;
 		this.otherSideId = otherSideId;
 		setupWriter();
-		setReceivingThread();
+		setReceivingThread().start();
 	}
 
 	@Override
 	protected void sendMessage(String message) {
-		writer.println(otherSideId);
-		writer.println(message);
-		writer.flush();
+		if (!isLoggingOut()) {
+			writer.println(otherSideId);
+			writer.println(message);
+			writer.flush();
+		}
 	}
 
-	private void setReceivingThread() {
-		thread = new Thread(new Runnable() {
+	private Thread setReceivingThread() {
+		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					keepReceiving = true;
-					while (keepReceiving) {
-						// cannot be here creates, infinite loop, because the condition is not usually met
-						//if (fromServer.ready()) {
-							String message = fromServer.readLine();
-							Message msg = new Message(message, ClientType.NOT_ME);
-							addMessage(msg);
-						//}
+					while (!isLoggingOut()) {
+						String message = fromServer.readLine();
+						Message msg = new Message(message, ClientType.NOT_ME);
+						addMessage(msg);
 					}
 				} catch (SocketException e) {
 					// throws when closing window, because it is waiting for server while we close the socket
@@ -62,7 +57,7 @@ public class CustomerGui extends ChatWindow {
 				}
 			}
 		});
-		thread.start();
+		return thread;
 	}
 	
 	@Override
@@ -75,17 +70,24 @@ public class CustomerGui extends ChatWindow {
 	}
 
 	@Override
-	protected void logOut() {
-		writer.println(Flags.CLIENT_LOGOUT);
-		writer.println();
+	protected void invokeLogOut() {
+		setLoggingOut(true);
+		writer.println(Flags.LOGOUT);
+		writer.println(otherSideId);
 		writer.flush();
-		keepReceiving = false;
+		logOut();
+	}
+
+	@Override
+	public void logOut() {
+		//setLoggingOut(true);
 		this.setVisible(false);
 		try {
 			socket.close();
-			thread.join();
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			System.exit(1);
 		}
 	}
 

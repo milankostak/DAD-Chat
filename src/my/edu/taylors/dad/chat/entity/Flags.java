@@ -16,7 +16,7 @@ public class Flags {
 
 	public static final String SENDING_CUSTOMER_TO_AGENT = "-3";
 
-	public static final String CLIENT_LOGOUT = "-4";
+	public static final String LOGOUT = "-4";
 
 	private Flags() { }
 }

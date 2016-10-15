@@ -58,7 +58,10 @@ public class ClientAgent extends Thread {
 				String id = fromServer.readLine();
 				if (id.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
 					getNewCustomer();
-				} else {
+				} else if (id.equals(Flags.LOGOUT)) {
+					String customerId = fromServer.readLine();
+					prepareLogOut(customerId);
+ 				} else {
 					String message = fromServer.readLine();
 					Message msg = new Message(message, ClientType.NOT_ME);
 					AgentGui agentGui = windows.get(Integer.parseInt(id));
@@ -76,6 +79,22 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	private void prepareLogOut(String customerId) {
+		int customerIdInt = Integer.parseInt(customerId);
+		AgentGui agentGui = windows.get(customerIdInt);
+		if (agentGui != null) {
+			// show message and log out
+			agentGui.addMessage(new Message("Customer ended conversation", ClientType.NOT_ME));
+			agentGui.logOut();
+			agentGui.saveConversation();
+			agentGui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			
+			windows.remove(customerIdInt);
+			// TODO save conversation
+			// TODO when closed last, app ends
+		}
+	}
+
 	private void getNewCustomer() throws IOException, ClassNotFoundException {
 
 		PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
@@ -84,7 +103,6 @@ public class ClientAgent extends Thread {
 		ObjectInputStream ios = new ObjectInputStream(socket.getInputStream());
 		AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
 		System.out.println("Agent received customer: " + customer.toString());
-		//TODO StreamCorruptedException when written two customers at server side
 
 		int clientId = customer.getId();
 		int windowId = customer.getWindowId();
