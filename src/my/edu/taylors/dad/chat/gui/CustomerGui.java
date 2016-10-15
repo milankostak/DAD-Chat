@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
 
 public class CustomerGui extends ChatWindow {
@@ -75,7 +76,7 @@ public class CustomerGui extends ChatWindow {
 
 	@Override
 	protected void logOut() {
-		writer.println("-1");
+		writer.println(Flags.CLIENT_LOGOUT);
 		writer.println();
 		writer.flush();
 		keepReceiving = false;

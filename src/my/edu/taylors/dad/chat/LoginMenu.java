@@ -23,6 +23,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.Flags;
 
 public class LoginMenu extends JFrame {
 
@@ -118,19 +119,19 @@ public class LoginMenu extends JFrame {
 			int type = Integer.parseInt(fromServer.readLine());
 			switch (type) {
 				// Guest
-				case 0:
+				case Flags.CUSTOMER_AUTHENTICATED_I:
 					new ClientCustomer(socket, auth);
 					this.setVisible(false);
 					break;
 
 				// Agent
-				case 1:
+				case Flags.AGENT_AUTHENTICATED_I:
 					new ClientAgent(socket, auth);
 					this.setVisible(false);
 					break;
 
 				// too many attempts
-				case -2:
+				case Flags.AUTHENTICATICATION_ATTEMTPS_I:
 					JOptionPane.showOptionDialog(null, "You made too many attempts. Try again later.", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
 					break;
 

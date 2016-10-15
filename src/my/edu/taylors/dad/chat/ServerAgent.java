@@ -14,6 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
+import my.edu.taylors.dad.chat.entity.Flags;
 
 public class ServerAgent extends Thread {
 
@@ -47,7 +48,7 @@ public class ServerAgent extends Thread {
 				BufferedReader brFromAgent = new BufferedReader(new InputStreamReader(agentSocket.getInputStream()));
 				while (true) {
 					String clientId = brFromAgent.readLine();
-					if (clientId.equals("-3")) {
+					if (clientId.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
 						// new customer connected to agent
 						sendCustomerToAgent();
 					} else {
@@ -103,7 +104,7 @@ public class ServerAgent extends Thread {
 
 						BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
 						PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
-						pwToAgent.println("-3");
+						pwToAgent.println(Flags.SENDING_CUSTOMER_TO_AGENT);
 						queue.put(new AuthWithWindowId(clientInfo.getAuth(), tempWindowId));
 
 						// customer to agent
@@ -111,7 +112,7 @@ public class ServerAgent extends Thread {
 						while (keepReceiving) {
 							String receivedId = brFromCustomer.readLine();
 							String receivedMsg = brFromCustomer.readLine();
-							if (receivedId.equals("-1")) {
+							if (receivedId.equals(Flags.CLIENT_LOGOUT)) {
 								keepReceiving = false;
 								client.close();
 							} else {

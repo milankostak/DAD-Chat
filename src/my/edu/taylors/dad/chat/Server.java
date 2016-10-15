@@ -9,6 +9,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
+import my.edu.taylors.dad.chat.entity.Flags;
 
 public class Server {
 	static Auth[] users = {
@@ -23,6 +24,8 @@ public class Server {
 	};
 
 	static ArrayBlockingQueue<ClientInfo> connectionQueue;
+
+	// for ID purpose
 	private int customerCount = 0;
 
 	public static void main(String[] args) {
@@ -86,26 +89,30 @@ public class Server {
 						attemptsNumber = 1;
 					}
 					lastAttempt = Calendar.getInstance();
+
 					// Check if the user matches any of our current users (Authentication)
 					if (attemptsNumber <= MAX_ATTEMPTS && (usr = user.authenticate(users)) != null) {
 						usr.setPassword("");
 						failed = false;
+
 						// 1 - Agent, 0 - Guest
 						if (usr.getType() == 0) {
-							pw.println("0");
+							pw.println(Flags.CUSTOMER_AUTHENTICATED);
 							usr.setId(customerCount++);
 							ClientInfo clientInfo = new ClientInfo(usr, client);
 							connectionQueue.put(clientInfo);
 						} else {
-							pw.println("1");
+							pw.println(Flags.AGENT_AUTHENTICATED);
 							new ServerAgent(client, usr);
 						}
+
+					// too many attempts
 					} else if (attemptsNumber > MAX_ATTEMPTS) {
-						// too many attempts
-						pw.println("-2");
+						pw.println(Flags.AUTHENTICATICATION_ATTEMTPS);
+
+					// Wrong combination
 					} else {
-						// Wrong combination
-						pw.println("-1");
+						pw.println(Flags.AUTHENTICATICATION_ERROR);
 					}
 				}
 			} catch (Exception e) {

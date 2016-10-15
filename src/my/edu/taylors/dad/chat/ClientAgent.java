@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
 import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.AgentGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
@@ -55,7 +56,7 @@ public class ClientAgent extends Thread {
 			keepReceiving = true;
 			while (keepReceiving) {
 				String id = fromServer.readLine();
-				if (id.equals("-3")) {
+				if (id.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
 					getNewCustomer();
 				} else {
 					String message = fromServer.readLine();
@@ -78,7 +79,7 @@ public class ClientAgent extends Thread {
 	private void getNewCustomer() throws IOException, ClassNotFoundException {
 
 		PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-		writer.println("-3");
+		writer.println(Flags.SENDING_CUSTOMER_TO_AGENT);
 		
 		ObjectInputStream ios = new ObjectInputStream(socket.getInputStream());
 		AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
