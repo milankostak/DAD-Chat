@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.Flags;
+import my.edu.taylors.dad.chat.gsa.GsaClient;
 
 public class LoginMenu extends JFrame {
 
@@ -33,7 +34,12 @@ public class LoginMenu extends JFrame {
 	private JPasswordField tfPassword;
 	private Socket socket = null;
 
+	private String serverIpAddress;
+
 	public LoginMenu() {
+		// firstly get server address
+		serverIpAddress = new GsaClient().getAddress();
+		// once it has the address, start other things
 		setUpGui();
 	}
 
@@ -107,7 +113,7 @@ public class LoginMenu extends JFrame {
 	private void authenticate() {
 		Auth auth = getAuth();
 		try {
-			if (socket == null) socket = new Socket("192.168.9.116", 9999);
+			if (socket == null) socket = new Socket(serverIpAddress, 9999);
 
 			// send credentials to server for authentication
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
@@ -150,7 +156,7 @@ public class LoginMenu extends JFrame {
 					e1.printStackTrace();
 				}
 			}
-			JOptionPane.showOptionDialog(null, "An error eccoured when trying to auhtneticate you. Server is not responding. Please try gagin later.",
+			JOptionPane.showOptionDialog(null, "An error eccoured when trying to authenticate you. Server is not responding. Please try again later.",
 					"Authentication error", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
 		}
 	}

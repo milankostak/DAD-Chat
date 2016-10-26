@@ -10,6 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
 import my.edu.taylors.dad.chat.entity.Flags;
+import my.edu.taylors.dad.chat.gsa.GsaServer;
 
 public class Server {
 	static Auth[] users = {
@@ -29,6 +30,9 @@ public class Server {
 	private int customerCount = 0;
 
 	public static void main(String[] args) {
+		// run server for listening for clients that want server ip address
+		new GsaServer();
+		// run regular messaging server
 		new Server();
 	}
 
@@ -78,8 +82,8 @@ public class Server {
 					PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
 
 					ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
-					Auth user = (Auth) ois.readObject();
-					Auth usr = null;
+					Auth receivedUser = (Auth) ois.readObject();
+					Auth authenticatedUser = null;
 
 					// check attempts
 					attemptsNumber++;
@@ -90,24 +94,25 @@ public class Server {
 					}
 					lastAttempt = Calendar.getInstance();
 
-					// Check if the user matches any of our current users (Authentication)
-					if (attemptsNumber <= MAX_ATTEMPTS && (usr = user.authenticate(users)) != null) {
-						usr.setPassword("");
-						failed = false;
+					// too many attempts
+					if (attemptsNumber > MAX_ATTEMPTS) {
 
-						if (usr.getType() == 0) {
+						pw.println(Flags.AUTHENTICATICATION_ATTEMTPS);
+					
+					// check if the user matches any of our current users (Authentication)
+					} else if (attemptsNumber <= MAX_ATTEMPTS && (authenticatedUser = receivedUser.authenticate(users)) != null) {
+						authenticatedUser.setPassword("");
+						failed = false;// stop AuthenticationHandler
+
+						if (authenticatedUser.getType() == 0) {
 							pw.println(Flags.CUSTOMER_AUTHENTICATED);
-							usr.setId(customerCount++);
-							ClientInfo clientInfo = new ClientInfo(usr, client);
+							authenticatedUser.setId(customerCount++);
+							ClientInfo clientInfo = new ClientInfo(authenticatedUser, client);
 							connectionQueue.put(clientInfo);
 						} else {
 							pw.println(Flags.AGENT_AUTHENTICATED);
-							new ServerAgent(client, usr);
+							new ServerAgent(client, authenticatedUser);
 						}
-
-					// too many attempts
-					} else if (attemptsNumber > MAX_ATTEMPTS) {
-						pw.println(Flags.AUTHENTICATICATION_ATTEMTPS);
 
 					// Wrong combination
 					} else {
