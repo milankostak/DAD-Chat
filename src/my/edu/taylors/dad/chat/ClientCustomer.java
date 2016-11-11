@@ -26,7 +26,7 @@ public class ClientCustomer extends Thread {
 		start();
 	}
 	
-	private void setupWaitingGui() {		
+	private void setupWaitingGui() {
 		waitingWindow = new WaitingWindow(" All our agents are fully assigned. Please wait.");
 		waitingWindow.setVisible(true);
 	}

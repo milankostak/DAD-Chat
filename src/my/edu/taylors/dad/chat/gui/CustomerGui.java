@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 
 import javax.swing.JFrame;
 
@@ -36,7 +35,6 @@ public class CustomerGui extends ChatWindow {
 		if (!isLoggingOut()) {
 			writer.println(otherSideId);
 			writer.println(message);
-			writer.flush();
 		}
 	}
 
@@ -47,17 +45,31 @@ public class CustomerGui extends ChatWindow {
 				try {
 					BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					while (!isLoggingOut()) {
+
 						String flag = fromServer.readLine();
-						if (flag != null && flag.equals(Flags.LOGOUT)) {
-							logOut(new Message("Agent ended the conversation", ClientType.NOT_ME));
-						} else {
-							String message = fromServer.readLine();
-							Message msg = new Message(message, ClientType.NOT_ME);
-							addMessage(msg);
+						if (flag != null) {
+
+							// agent logged out, customer sending back confirmation
+							if (flag.equals(Flags.AGENT_LOGGING_OUT)) {
+								writer.println(Flags.AGENT_LOGGING_OUT);
+								writer.close();
+								fromServer.close();
+								logOut(new Message("Agent ended the conversation", ClientType.NOT_ME));
+							
+							// customer logged out, this is confirmation
+							} else if (flag.equals(Flags.CUSTOMER_LOGGING_OUT)) {
+								writer.close();
+								fromServer.close();
+								logOut(new Message("Customer ended the conversation", ClientType.ME));
+
+							} else {
+								String message = fromServer.readLine();
+								Message msg = new Message(message, ClientType.NOT_ME);
+								addMessage(msg);
+							}
+
 						}
 					}
-				} catch (SocketException e) {
-					System.err.println("Customer disconnected");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -69,7 +81,7 @@ public class CustomerGui extends ChatWindow {
 	@Override
 	protected void setupWriter() {
 		try {
-			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -78,10 +90,9 @@ public class CustomerGui extends ChatWindow {
 	@Override
 	protected void invokeLogOut() {
 		setLoggingOut(true);
-		writer.println(Flags.LOGOUT);
+		writer.println(Flags.CUSTOMER_LOGGING_OUT);
 		writer.println(otherSideId);
-		writer.flush();
-		logOut(new Message("Customer ended the conversation", ClientType.ME));
+		// don't close writer here, it causes Socket Exception for BufferedReader fromServer
 	}
 
 	@Override

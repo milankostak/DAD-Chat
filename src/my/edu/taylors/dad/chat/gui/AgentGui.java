@@ -42,14 +42,13 @@ public class AgentGui extends ChatWindow {
 		if (!isLoggingOut()) {
 			writer.println(clientId);
 			writer.println(message);
-			writer.flush();
 		}
 	}
 
 	@Override
 	protected void setupWriter() {
 		try {
-			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -57,10 +56,8 @@ public class AgentGui extends ChatWindow {
 
 	@Override
 	protected void invokeLogOut() {
-		setLoggingOut(true);
-		writer.println(Flags.LOGOUT);
+		writer.println(Flags.AGENT_LOGGING_OUT);
 		writer.println(clientId);
-		writer.flush();
 		logOut(new Message("Agent ended the conversation", ClientType.ME));
 	}
 
@@ -95,6 +92,10 @@ public class AgentGui extends ChatWindow {
 		} finally {
 			if (writer != null) writer.close();
 		}
+	}
+
+	public PrintWriter getWriter() {
+		return writer;
 	}
 
 }

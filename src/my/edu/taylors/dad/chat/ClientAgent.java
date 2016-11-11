@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +24,6 @@ public class ClientAgent extends Thread {
 
 	private JFrame waitingFrame;
 	public static Map<Integer, AgentGui> windows = new HashMap<>(2);
-	private boolean keepReceiving;
 	private Auth agent;
 
 	private Socket socket;
@@ -54,26 +52,31 @@ public class ClientAgent extends Thread {
 		try {
 			// customer to agent
 			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			keepReceiving = true;
+			boolean keepReceiving = true;
 			while (keepReceiving) {
-				String id = fromServer.readLine();
-				if (id.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
+				String message = fromServer.readLine();
+
+				if (message.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
 					getNewCustomer();
-				} else if (id.equals(Flags.LOGOUT)) {
+
+				// customer logged out, confirm back to server to break loop
+				} else if (message.equals(Flags.CUSTOMER_LOGGING_OUT)) {
 					String customerId = fromServer.readLine();
+					AgentGui agentGui = windows.get(Integer.parseInt(customerId));
+					agentGui.getWriter().println(Flags.CUSTOMER_LOGGING_OUT);
+					agentGui.getWriter().println(customerId);
 					prepareLogOut(customerId);
+
  				} else {
-					String message = fromServer.readLine();
-					Message msg = new Message(message, ClientType.NOT_ME);
-					AgentGui agentGui = windows.get(Integer.parseInt(id));
+ 					int customerId = Integer.parseInt(message);
+					String messageFromAgent = fromServer.readLine();
+					Message msg = new Message(messageFromAgent, ClientType.NOT_ME);
+					AgentGui agentGui = windows.get(customerId);
 					if (agentGui != null) {
 						agentGui.addMessage(msg);
 					}
 				}
 			}
-			
-		} catch (SocketException e) {
-			e.printStackTrace();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
