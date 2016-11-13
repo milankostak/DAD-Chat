@@ -1,4 +1,4 @@
-package my.edu.taylors.dad.chat;
+package my.edu.taylors.dad.chat.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;

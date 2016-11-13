@@ -1,4 +1,4 @@
-package my.edu.taylors.dad.chat;
+package my.edu.taylors.dad.chat.server;
 
 import my.edu.taylors.dad.chat.gsa.GsaServer;
 import my.edu.taylors.dad.chat.saving.RmiServer;

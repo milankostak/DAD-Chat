@@ -11,8 +11,8 @@ import java.rmi.registry.Registry;
 
 import javax.swing.JFrame;
 
-import my.edu.taylors.dad.chat.ClientAgent;
-import my.edu.taylors.dad.chat.LoginMenu;
+import my.edu.taylors.dad.chat.client.ClientAgent;
+import my.edu.taylors.dad.chat.client.LoginMenu;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;

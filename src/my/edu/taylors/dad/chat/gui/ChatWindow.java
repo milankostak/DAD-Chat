@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
-import my.edu.taylors.dad.chat.ClientAgent;
+import my.edu.taylors.dad.chat.client.ClientAgent;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 
@@ -157,7 +157,7 @@ public abstract class ChatWindow extends JFrame {
 		String message = tfMainInput.getText();
 		ClientAgent.sendBoth(message);
 	}
-	
+
 	/**
 	 * Get input and call other method
 	 */

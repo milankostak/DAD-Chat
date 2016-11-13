@@ -1,4 +1,4 @@
-package my.edu.taylors.dad.chat;
+package my.edu.taylors.dad.chat.client;
 
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
