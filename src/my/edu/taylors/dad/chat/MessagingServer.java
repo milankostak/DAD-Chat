@@ -10,9 +10,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
 import my.edu.taylors.dad.chat.entity.Flags;
-import my.edu.taylors.dad.chat.gsa.GsaServer;
 
-public class Server {
+public class MessagingServer {
 	static Auth[] users = {
 			new Auth("omar", "123", 0),
 			new Auth("test", "123", 0),
@@ -29,14 +28,7 @@ public class Server {
 	// for ID purpose
 	private int customerCount = 0;
 
-	public static void main(String[] args) {
-		// run server for listening for clients that want server ip address
-		new GsaServer();
-		// run regular messaging server
-		new Server();
-	}
-
-	public Server() {
+	public MessagingServer() {
 		customerCount = 0;
 		connectionQueue = new ArrayBlockingQueue<ClientInfo>(5);
 		ServerSocket server = null;

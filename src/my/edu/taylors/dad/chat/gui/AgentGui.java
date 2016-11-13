@@ -1,20 +1,22 @@
 package my.edu.taylors.dad.chat.gui;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Date;
-import java.util.List;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.ClientAgent;
+import my.edu.taylors.dad.chat.LoginMenu;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
+import my.edu.taylors.dad.chat.saving.ISaver;
 
 public class AgentGui extends ChatWindow {
 	private static final long serialVersionUID = 1L;
@@ -71,27 +73,16 @@ public class AgentGui extends ChatWindow {
 		clientAgent.removeWindow(clientId);
 	}
 
-	public void saveConversation() {
-		List<Message> messages = getChatListModel().getMessages();
-				long timestamp = new Date().getTime();
-		File file = new File("logs/" + timestamp + ".txt");
-		file.getParentFile().mkdirs();
-
-		PrintWriter writer = null;
+	private void saveConversation() {
 		try {
-			writer = new PrintWriter(file);
-			writer.println("Created on " + new Date());
-			writer.println();
-			for (int i = 0; i < messages.size(); i++) {
-				Message msg = messages.get(i);
-				String who = msg.getClientType() == ClientType.ME ? "Agent " + agentName : "Customer " + customerName;
-				writer.println(who + ": "  + msg.toString());
-			}
-		} catch (FileNotFoundException e) {
+			Registry registry = LocateRegistry.getRegistry(LoginMenu.serverIpAddress);
+			ISaver saver = (ISaver) registry.lookup("saverObject");
+
+			saver.saveConversation(getChatListModel().getMessages(), agentName, customerName);
+		} catch (RemoteException | NotBoundException e) {
 			e.printStackTrace();
-		} finally {
-			if (writer != null) writer.close();
 		}
+		
 	}
 
 	public PrintWriter getWriter() {

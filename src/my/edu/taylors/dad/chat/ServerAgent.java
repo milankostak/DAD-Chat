@@ -121,7 +121,7 @@ public class ServerAgent extends Thread {
 				try {
 					while (true) {
 						tempWindowId = windowCount++;
-						clientInfo = Server.connectionQueue.take();
+						clientInfo = MessagingServer.connectionQueue.take();
 						client = clientInfo.getSocket();
 						customersMap.put(clientInfo.getAuth().getId(), client);
 

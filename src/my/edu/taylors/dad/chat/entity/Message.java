@@ -1,10 +1,12 @@
 package my.edu.taylors.dad.chat.entity;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Message {
+public class Message implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	// time of message, just for showing in GUI
 	private Date time;
 	// content of the message

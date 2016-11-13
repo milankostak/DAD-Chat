@@ -34,7 +34,7 @@ public class LoginMenu extends JFrame {
 	private JPasswordField tfPassword;
 	private Socket socket = null;
 
-	private String serverIpAddress;
+	public static String serverIpAddress;
 
 	public LoginMenu() {
 		// firstly get server address
