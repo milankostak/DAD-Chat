@@ -32,4 +32,5 @@ public class VoicePlayThread extends Thread {
 			System.out.println(e);
 		}
 	}
+
 }

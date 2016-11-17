@@ -2,8 +2,6 @@ package my.edu.taylors.dad.chat.voice;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -30,43 +28,37 @@ public class VoiceClient extends JFrame {
 	public static void main(String args[]) {
 		new VoiceClient().setVisible(true);
 	}
-	
+
 	public VoiceClient() {
 		final JButton capture = new JButton("Capture");
 		final JButton stop = new JButton("Stop");
 		final JButton play = new JButton("Playback");
-	
+
 		capture.setEnabled(true);
 		stop.setEnabled(false);
 		play.setEnabled(false);
-	
-		capture.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				capture.setEnabled(false);
-				stop.setEnabled(true);
-				play.setEnabled(false);
-				captureAudio();
-			}
+
+		// init capture button
+		capture.addActionListener(e -> {
+			capture.setEnabled(false);
+			stop.setEnabled(true);
+			play.setEnabled(false);
+			captureAudio();
 		});
 		getContentPane().add(capture);
-	
-		stop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				capture.setEnabled(true);
-				stop.setEnabled(false);
-				play.setEnabled(true);
-				stopAudioCapture = true;
-				targetDataLine.close();
-			}
+
+		// init stop button
+		stop.addActionListener(e -> {
+			capture.setEnabled(true);
+			stop.setEnabled(false);
+			play.setEnabled(true);
+			stopAudioCapture = true;
+			targetDataLine.close();
 		});
 		getContentPane().add(stop);
-	
-		play.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				playAudio();
-			}
-		});
+
+		// init play button
+		play.addActionListener(e -> playAudio());
 		getContentPane().add(play);
 
 		getContentPane().setLayout(new FlowLayout());
@@ -118,13 +110,13 @@ public class VoiceClient extends JFrame {
 	private class VoiceCaptureThread extends Thread {
 	
 		byte tempBuffer[] = new byte[10000];
-		
+
 		public VoiceCaptureThread() {
 			start();
 		}
-	
+
 		public void run() {
-	
+
 			byteOutputStream = new ByteArrayOutputStream();
 			stopAudioCapture = false;
 			try (DatagramSocket clientSocket = new DatagramSocket(8786)) {
