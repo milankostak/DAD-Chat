@@ -1,15 +1,10 @@
 package my.edu.taylors.dad.chat.voice;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.SourceDataLine;
 
 import my.edu.taylors.dad.chat.entity.Ports;
 
@@ -26,45 +21,47 @@ import my.edu.taylors.dad.chat.entity.Ports;
  * 	<li>Improved exception handling</li>
  * 	<li>Listeners with lambdas</li>
  * 	<li>VoiceServe extends a Thread now</li>
+ * 	<li>Completely removed GUI</li>
+ * 	<li>Server now doesn't play immediately, but stores the sound for later play</li>
  * </ul>
  */
 public class VoiceServer extends Thread {
 
-	public static void main(String args[]) {
-		new VoiceServer();
-	}
-	
+	private volatile ByteArrayOutputStream byteOutputStream;
+	private boolean cleared;
+
 	public VoiceServer() {
+		cleared = true;
 		start();
+	}
+
+	public ByteArrayOutputStream getByteOutputStream() {
+		cleared = true;
+		return byteOutputStream;
 	}
 
 	@Override
 	public void run() {
 		try (DatagramSocket serverSocket = new DatagramSocket(Ports.VOICE_SERVER)) { 
+
 			byte[] receiveData = new byte[10000];
+
 			while (true) {
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
 				System.out.println("RECEIVED: " + receivePacket.getAddress().getHostAddress() + ":" + receivePacket.getPort());
-				try {
-					byte aData[] = receivePacket.getData();
-					//System.out.println(" order: "+aData[0]);
-					InputStream byteInputStream = new ByteArrayInputStream(aData);
 
-					AudioFormat aFormat = VoiceUtils.getAudioFormat();
-					AudioInputStream inputStream = new AudioInputStream(byteInputStream, aFormat, aData.length / aFormat.getFrameSize());
-					DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, aFormat);
-
-					SourceDataLine sourceLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-					sourceLine.open(aFormat);
-					sourceLine.start();
-
-					new VoicePlayThread(inputStream, sourceLine);
-				} catch (Exception e) {
-					e.printStackTrace();
+				if (cleared) {
+					byteOutputStream = new ByteArrayOutputStream();
+					cleared = false;
 				}
+
+				byte aData[] = receivePacket.getData();
+				byteOutputStream.write(aData, 0, receivePacket.getLength());
 			}
-		} catch (Exception e) {
+		} catch (BindException e) {
+			System.err.println("BindException VoiceServer::run - Server is already running on this machine.");
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
