@@ -16,13 +16,13 @@ import javax.sound.sampled.SourceDataLine;
  * Which is licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a><br>
  * <p>Major changes made:</p>
  * <ul>
- *   <li>Removed unnecessary variables</li>
- * 	 <li>Fields into local variables where possible</li>
- * 	 <li>Separated Play Thread</li>
- * 	 <li>Fixed closing leaks</li>
- * 	 <li>Code formatted in big matter to improve readability</li>
- * 	 <li>Improved exception handling</li>
- * 	 <li>Listeners with lambdas</li>
+ * 	<li>Removed unnecessary variables</li>
+ * 	<li>Fields into local variables where possible</li>
+ * 	<li>Separated Play Thread</li>
+ * 	<li>Fixed closing leaks</li>
+ * 	<li>Code formatted in big matter to improve readability</li>
+ * 	<li>Improved exception handling</li>
+ * 	<li>Listeners with lambdas</li>
  * </ul>
  */
 public class VoiceServer {
@@ -37,9 +37,10 @@ public class VoiceServer {
 			while (true) {
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
-				System.out.println("RECEIVED: " + receivePacket.getAddress().getHostAddress() + " " + receivePacket.getPort());
+				System.out.print("RECEIVED: " + receivePacket.getAddress().getHostAddress() + " " + receivePacket.getPort());
 				try {
 					byte aData[] = receivePacket.getData();
+					System.out.println(" order: "+aData[0]);
 					InputStream byteInputStream = new ByteArrayInputStream(aData);
 
 					AudioFormat aFormat = VoiceUtils.getAudioFormat();

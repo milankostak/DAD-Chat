@@ -119,14 +119,16 @@ public class VoiceClient extends JFrame {
 		}
 
 		public void run() {
+			int order = 0;
 
 			byteOutputStream = new ByteArrayOutputStream();
 			stopAudioCapture = false;
 			try (DatagramSocket clientSocket = new DatagramSocket(8786)) {
 				// TODO add IP address from LoginMenu
-				InetAddress IPAddress = InetAddress.getByName("127.0.0.1");
+				InetAddress IPAddress = InetAddress.getByName("192.168.137.195");
 				while (!stopAudioCapture) {
 					int cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
+					tempBuffer[0] = (byte) order++;
 					if (cnt > 0) {
 						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, IPAddress, 9786);
 						clientSocket.send(sendPacket);
