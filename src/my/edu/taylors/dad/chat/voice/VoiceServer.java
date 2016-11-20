@@ -25,6 +25,7 @@ import my.edu.taylors.dad.chat.entity.Ports;
  * 	<li>Code formatted in big matter to improve readability</li>
  * 	<li>Improved exception handling</li>
  * 	<li>Listeners with lambdas</li>
+ * 	<li>VoiceServe extends a Thread now</li>
  * </ul>
  */
 public class VoiceServer extends Thread {

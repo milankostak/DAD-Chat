@@ -2,6 +2,7 @@ package my.edu.taylors.dad.chat.server;
 
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Calendar;
@@ -45,8 +46,11 @@ public class MessagingServer {
 			} finally {
 				if (server != null) server.close();
 			}
+		} catch (BindException e) {
+			System.err.println("There is already a server running on this port. Server is shuting down.");
+			e.printStackTrace();
 		} catch (Exception e) {
-			System.err.println("Server Error");
+			System.err.println("Server Error. Server is shuting down.");
 			e.printStackTrace();
 		}
 	}

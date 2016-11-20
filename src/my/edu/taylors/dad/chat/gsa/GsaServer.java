@@ -1,6 +1,7 @@
 package my.edu.taylors.dad.chat.gsa;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ConnectException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -39,6 +40,9 @@ public class GsaServer extends Thread {
 					if (socket != null) socket.close();
 				}
 			}
+		} catch (BindException e) {
+			System.err.println("There is already a server running on this port. Server is shuting down.");
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
