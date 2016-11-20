@@ -5,6 +5,9 @@ import java.io.IOException;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.SourceDataLine;
 
+/**
+ * For source see {@link VoiceServer}
+ */
 public class VoicePlayThread extends Thread {
 
 	byte tempBuffer[] = new byte[10000];

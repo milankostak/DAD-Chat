@@ -11,6 +11,20 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
+/**
+ * Source: {@linkplain <a href="http://stackoverflow.com/revisions/17174202/2">http://stackoverflow.com/revisions/17174202/2</a>}<br>
+ * Which is licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a><br>
+ * <p>Major changes made:</p>
+ * <ul>
+ *   <li>Removed unnecessary variables</li>
+ * 	 <li>Fields into local variables where possible</li>
+ * 	 <li>Separated Play Thread</li>
+ * 	 <li>Fixed closing leaks</li>
+ * 	 <li>Code formatted in big matter to improve readability</li>
+ * 	 <li>Improved exception handling</li>
+ * 	 <li>Listeners with lambdas</li>
+ * </ul>
+ */
 public class VoiceServer {
 
 	public static void main(String args[]) {

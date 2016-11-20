@@ -2,6 +2,9 @@ package my.edu.taylors.dad.chat.voice;
 
 import javax.sound.sampled.AudioFormat;
 
+/**
+ * For source see {@link VoiceServer}
+ */
 public class VoiceUtils {
 
 	private VoiceUtils() { }

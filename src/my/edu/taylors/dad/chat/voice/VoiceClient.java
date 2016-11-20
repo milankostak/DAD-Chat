@@ -18,6 +18,9 @@ import javax.sound.sampled.TargetDataLine;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+/**
+ * For source see {@link VoiceServer}
+ */
 public class VoiceClient extends JFrame {
 	private static final long serialVersionUID = 1L;
 
@@ -120,6 +123,7 @@ public class VoiceClient extends JFrame {
 			byteOutputStream = new ByteArrayOutputStream();
 			stopAudioCapture = false;
 			try (DatagramSocket clientSocket = new DatagramSocket(8786)) {
+				// TODO add IP address from LoginMenu
 				InetAddress IPAddress = InetAddress.getByName("127.0.0.1");
 				while (!stopAudioCapture) {
 					int cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
