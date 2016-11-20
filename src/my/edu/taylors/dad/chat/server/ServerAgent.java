@@ -76,6 +76,14 @@ public class ServerAgent extends Thread {
 
 						client.close();
 						customersMap.remove(clientIdString);
+
+					// when TODO
+					} else if (clientId.equals(Flags.VOICE_CAPTURE_FINISHED)) {
+						String clientIdString = brFromAgent.readLine();
+						int clientIdInt = Integer.parseInt(clientIdString);
+						Socket client = customersMap.get(clientIdInt);
+						PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
+						pwToCustomer.println(Flags.VOICE_CAPTURE_FINISHED);
 						
 					} else {
 						String receivedMsg = brFromAgent.readLine();
@@ -154,6 +162,12 @@ public class ServerAgent extends Thread {
 									// no need to send back to agent, because he still listens to other customers
 									client.close();
 
+								// when TODO
+								} else if (receivedId.equals(Flags.VOICE_CAPTURE_FINISHED)) {
+									String receivedId2 = brFromCustomer.readLine();
+									pwToAgent.println(Flags.VOICE_CAPTURE_FINISHED);
+									pwToAgent.println(receivedId2);
+									
 								} else {
 									String receivedMsg = brFromCustomer.readLine();
 									pwToAgent.println(receivedId);

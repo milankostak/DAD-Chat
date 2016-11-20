@@ -5,10 +5,16 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.ByteArrayOutputStream;
+import java.net.InetAddress;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,6 +29,9 @@ import javax.swing.SwingConstants;
 import my.edu.taylors.dad.chat.client.ClientAgent;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
+import my.edu.taylors.dad.chat.entity.MessageType;
+import my.edu.taylors.dad.chat.voice.VoiceClient;
+import my.edu.taylors.dad.chat.voice.VoicePlayThread;
 
 public abstract class ChatWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -30,17 +39,19 @@ public abstract class ChatWindow extends JFrame {
 	// GUI components
 	private JFrame mainFrame;
 	private JTextField tfMainInput;
-	private JButton btSendBoth, btSend, btLogOut;
+	private JButton btSendBoth, btSend, btLogOut, btCapture, btStop;
 	private ChatListModel chatListModel;
 	private JScrollBar vertical;
 	private ClientType clientType;
+	private VoiceClient voiceClient;
 
 	private boolean isLoggingOut;
 
-	public ChatWindow(String title, ClientType clientType) {
+	public ChatWindow(String title, ClientType clientType, InetAddress IP) {
 		this.clientType = clientType;
 		this.isLoggingOut = false;
 		setUpGui(title);
+		voiceClient = new VoiceClient(IP);
 	}
 
 	/**
@@ -64,6 +75,9 @@ public abstract class ChatWindow extends JFrame {
 	 * @param message message to send
 	 */
 	protected abstract void sendMessage(String message);
+
+
+	protected abstract void sendVoiceFinished();
 
 	/**
 	 * Main method for setting up the GUI
@@ -101,11 +115,25 @@ public abstract class ChatWindow extends JFrame {
 		renderer.setHorizontalAlignment(SwingConstants.CENTER);
 		chatList.setCellRenderer(new ChatRenderer());
 		chatList.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		chatList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				chatListClick(e.getPoint(), chatList);
+			}
+		});
 
 		JScrollPane chatListScroll = new JScrollPane(chatList);
 		vertical = chatListScroll.getVerticalScrollBar();
 
 		return chatListScroll;
+	}
+
+	private void chatListClick(Point point, JList<Message> chatList) {
+		int index = chatList.locationToIndex(point);
+		Message item = (Message) chatList.getModel().getElementAt(index);
+		if (item.getMessageType() == MessageType.VOICE) {
+			new VoicePlayThread(item.getVoiceData());
+		}
 	}
 
 	/**
@@ -121,10 +149,10 @@ public abstract class ChatWindow extends JFrame {
 		btSend.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btSend.addActionListener(e -> showMessage());
 
-		BorderLayout bottomLayout = new BorderLayout(); 
-		bottomLayout.setHgap(5);
-		JPanel bottomPanel = new JPanel(bottomLayout);
-		bottomPanel.add(tfMainInput, BorderLayout.CENTER);
+		BorderLayout messagingLayout = new BorderLayout(); 
+		messagingLayout.setHgap(5);
+		JPanel messagingPanel = new JPanel(messagingLayout);
+		messagingPanel.add(tfMainInput, BorderLayout.CENTER);
 
 		JPanel btPanel = new JPanel(new FlowLayout());
 		btPanel.add(btSend);
@@ -137,18 +165,60 @@ public abstract class ChatWindow extends JFrame {
 			btPanel.add(btSendBoth);
 		}
 
+		messagingPanel.add(btPanel, BorderLayout.EAST);
+		messagingPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+
+		BorderLayout voiceLayout = new BorderLayout(); 
+		voiceLayout.setHgap(5);
+		JPanel voicePanel = new JPanel(voiceLayout);
+
 		btLogOut = new JButton("Log Out");
 		btLogOut.setMnemonic(KeyEvent.VK_L);
 		btLogOut.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btLogOut.addActionListener(e -> invokeLogOut());
-		btPanel.add(btLogOut);
+		voicePanel.add(btLogOut, BorderLayout.EAST);
 
-		bottomPanel.add(btPanel, BorderLayout.EAST);
-		bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		JPanel voiceLeftPanel = new JPanel(new FlowLayout());
+		btCapture = new JButton("Capture voice");
+		btCapture.setMnemonic(KeyEvent.VK_C);
+		btCapture.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btCapture.addActionListener(e -> startCapture());
+		voiceLeftPanel.add(btCapture);
+
+		btStop = new JButton("Stop capturing");
+		btStop.setMnemonic(KeyEvent.VK_P);
+		btStop.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btStop.addActionListener(e -> stopCapture());
+		voiceLeftPanel.add(btStop);
+		
+		voicePanel.add(voiceLeftPanel, BorderLayout.WEST);
+
+
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+		bottomPanel.add(messagingPanel);
+		bottomPanel.add(voicePanel);
 
 		return bottomPanel;
 	}
-	
+
+	/**
+	 * Method for start of capturing
+	 */
+	private void startCapture() {
+		voiceClient.captureAudio();
+	}
+
+	/**
+	 * Stop capturing, add message to window
+	 */
+	private void stopCapture() {
+		ByteArrayOutputStream voiceData = voiceClient.stopCapture();
+		addMessage(new Message(voiceData, ClientType.ME));
+		sendVoiceFinished();
+	}
+
 	/**
 	 * In case of agent, it is possible to send one message to both customers
 	 * Here it all starts
@@ -199,6 +269,8 @@ public abstract class ChatWindow extends JFrame {
 		btLogOut.setEnabled(false);
 		if (btSendBoth != null) btSendBoth.setEnabled(false);
 		tfMainInput.setEnabled(false);
+		btCapture.setEnabled(false);
+		btStop.setEnabled(false);
 	}
 	
 	/**

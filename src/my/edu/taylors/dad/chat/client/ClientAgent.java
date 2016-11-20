@@ -2,6 +2,7 @@ package my.edu.taylors.dad.chat.client;
 
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -20,29 +21,28 @@ import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.AgentGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
-import my.edu.taylors.dad.chat.voice.VoiceClient;
 import my.edu.taylors.dad.chat.voice.VoiceServer;
 
 public class ClientAgent extends Thread {
 
-	private JFrame waitingFrame;
-	public static Map<Integer, AgentGui> windows = new HashMap<>(2);
-
-	private Auth agent;
-	private InetAddress customerIp;
+	private JFrame waitingWindow;
 	private Socket socket;
+	private Auth agent;
+	private VoiceServer voiceServer;
+	
+	public static Map<Integer, AgentGui> windows = new HashMap<>(2);
 
 	public ClientAgent(Socket socket, Auth agent) {
 		this.socket = socket;
 		this.agent = agent;
 		setupWaitingGui();
+		voiceServer = new VoiceServer();
 		start();
-		new VoiceServer();
 	}
 
 	private void setupWaitingGui() {		
-		waitingFrame = new WaitingWindow(" Please wait for a client to connect.");
-		waitingFrame.setVisible(true);
+		waitingWindow = new WaitingWindow(" Please wait for a client to connect.");
+		waitingWindow.setVisible(true);
 	}
 
 	public static void sendBoth(String message) {
@@ -72,6 +72,15 @@ public class ClientAgent extends Thread {
 					agentGui.getWriter().println(customerId);
 					prepareLogOut(customerId);
 
+				} else if (message.equals(Flags.VOICE_CAPTURE_FINISHED)) {
+					String customerId = fromServer.readLine();
+					AgentGui agentGui = windows.get(Integer.parseInt(customerId));
+					ByteArrayOutputStream voiceData = voiceServer.getByteOutputStream();
+					Message msg = new Message(voiceData, ClientType.NOT_ME);
+					if (agentGui != null) {
+						agentGui.addMessage(msg);
+					}
+					
  				} else {
  					int customerId = Integer.parseInt(message);
 					String messageFromAgent = fromServer.readLine();
@@ -101,7 +110,7 @@ public class ClientAgent extends Thread {
 	public void removeWindow(int customerIdInt) {
 		windows.remove(customerIdInt);
 		if (windows.size() == 0) {
-			waitingFrame.setVisible(true);
+			waitingWindow.setVisible(true);
 		}
 	}
 
@@ -116,14 +125,13 @@ public class ClientAgent extends Thread {
 
 		int clientId = customer.getId();
 		int windowId = customer.getWindowId();
-		customerIp = customer.getInetAddress();
-		new VoiceClient(customerIp);
+		InetAddress customerIp = customer.getInetAddress();
 
-		AgentGui gui = new AgentGui(this, socket, customer.getUsername(), clientId, agent.getUsername());
+		AgentGui gui = new AgentGui(this, socket, customer.getUsername(), clientId, agent.getUsername(), customerIp);
 		windows.put(windowId, gui);
 
 		gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));
 		
-		waitingFrame.setVisible(false);
+		waitingWindow.setVisible(false);
 	}
 }

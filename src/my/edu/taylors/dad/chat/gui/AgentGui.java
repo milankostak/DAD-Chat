@@ -3,6 +3,7 @@ package my.edu.taylors.dad.chat.gui;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -29,8 +30,8 @@ public class AgentGui extends ChatWindow {
 	
 	private String customerName, agentName;
 
-	public AgentGui(ClientAgent clientAgent, Socket socket, String customerName, int clientId, String agentName) {
-		super("Agent: conversation with customer " + customerName, ClientType.AGENT);
+	public AgentGui(ClientAgent clientAgent, Socket socket, String customerName, int clientId, String agentName, InetAddress IP) {
+		super("Agent: conversation with customer " + customerName, ClientType.AGENT, IP);
 		this.clientAgent = clientAgent;
 		this.socket = socket;
 		this.customerName = customerName;
@@ -44,6 +45,14 @@ public class AgentGui extends ChatWindow {
 		if (!isLoggingOut()) {
 			writer.println(clientId);
 			writer.println(message);
+		}
+	}
+
+	@Override
+	protected void sendVoiceFinished() {
+		if (!isLoggingOut()) {
+			writer.println(Flags.VOICE_CAPTURE_FINISHED);
+			writer.println(clientId);
 		}
 	}
 

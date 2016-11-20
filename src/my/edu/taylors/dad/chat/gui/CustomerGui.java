@@ -1,11 +1,10 @@
 package my.edu.taylors.dad.chat.gui;
 
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 
 import javax.swing.JFrame;
@@ -22,12 +21,11 @@ public class CustomerGui extends ChatWindow {
 	private PrintWriter writer;
 	private int otherSideId;
 
-	public CustomerGui(Socket socket, String title, int otherSideId) {
-		super(title, ClientType.CUSTOMER);
+	public CustomerGui(Socket socket, String title, int otherSideId, InetAddress IP) {
+		super(title, ClientType.CUSTOMER, IP);
 		this.socket = socket;
 		this.otherSideId = otherSideId;
 		setupWriter();
-		setReceivingThread().start();
 	}
 
 	@Override
@@ -38,46 +36,14 @@ public class CustomerGui extends ChatWindow {
 		}
 	}
 
-	private Thread setReceivingThread() {
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					while (!isLoggingOut()) {
-
-						String flag = fromServer.readLine();
-						if (flag != null) {
-
-							// agent logged out, customer sending back confirmation
-							if (flag.equals(Flags.AGENT_LOGGING_OUT)) {
-								writer.println(Flags.AGENT_LOGGING_OUT);
-								writer.close();
-								fromServer.close();
-								logOut(new Message("Agent ended the conversation", ClientType.NOT_ME));
-							
-							// customer logged out, this is confirmation
-							} else if (flag.equals(Flags.CUSTOMER_LOGGING_OUT)) {
-								writer.close();
-								fromServer.close();
-								logOut(new Message("Customer ended the conversation", ClientType.ME));
-
-							} else {
-								String message = fromServer.readLine();
-								Message msg = new Message(message, ClientType.NOT_ME);
-								addMessage(msg);
-							}
-
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		return thread;
+	@Override
+	protected void sendVoiceFinished() {
+		if (!isLoggingOut()) {
+			writer.println(Flags.VOICE_CAPTURE_FINISHED);
+			writer.println(otherSideId);
+		}
 	}
-	
+
 	@Override
 	protected void setupWriter() {
 		try {
@@ -89,10 +55,9 @@ public class CustomerGui extends ChatWindow {
 
 	@Override
 	protected void invokeLogOut() {
-		setLoggingOut(true);
 		writer.println(Flags.CUSTOMER_LOGGING_OUT);
 		writer.println(otherSideId);
-		// don't close writer here, it causes Socket Exception for BufferedReader fromServer
+		logOut(new Message("Customer ended the conversation", ClientType.ME));
 	}
 
 	@Override
@@ -109,6 +74,10 @@ public class CustomerGui extends ChatWindow {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public PrintWriter getWriter() {
+		return writer;
 	}
 
 }
