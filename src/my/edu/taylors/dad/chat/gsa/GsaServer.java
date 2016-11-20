@@ -20,24 +20,19 @@ public class GsaServer extends Thread {
 	
 	@Override
 	public void run() {
-		DatagramSocket dgSocket = null;
-		try {
-			dgSocket = new DatagramSocket(Ports.GSA_SERVER);
+		try (DatagramSocket dgSocket = new DatagramSocket(Ports.GSA_SERVER)) {
 
 			while(true) {
 				byte[] buffer = new byte[1];
 				
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 				dgSocket.receive(packet);
-				
-				Socket socket = null;
-				try {
-					socket = new Socket(packet.getAddress(), Ports.GSA_CLIENT);
+
+				try (Socket socket = new Socket(packet.getAddress(), Ports.GSA_CLIENT)) {
+
 				} catch (ConnectException e) {
 					System.err.println("ConnectException");
 					System.err.println("Client already received server address through other its interface.");
-				} finally {
-					if (socket != null) socket.close();
 				}
 			}
 		} catch (BindException e) {
@@ -45,8 +40,6 @@ public class GsaServer extends Thread {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			if (dgSocket != null) dgSocket.close();
 		}
 	}
 

@@ -23,11 +23,10 @@ public class GsaClient extends Thread {
 	public GsaClient() { }
 	
 	public String getAddress() {
-		ServerSocket serverConn = null;
 		String serverAddress = null;
 		try {
-			try {
-				serverConn = new ServerSocket(Ports.GSA_CLIENT);
+			try (ServerSocket serverConn = new ServerSocket(Ports.GSA_CLIENT)) {
+				
 				start();// start thread for sending requests
 				// then wait for reply
 				Socket socket = serverConn.accept();
@@ -35,8 +34,6 @@ public class GsaClient extends Thread {
 				serverAddress = socket.getInetAddress().getHostAddress();
 				System.out.println("Received server address: " + serverAddress);
 
-			} finally {
-				serverConn.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
