@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
+import my.edu.taylors.dad.chat.entity.AuthIdIp;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
 import my.edu.taylors.dad.chat.entity.Flags;
 
@@ -23,7 +23,7 @@ public class ServerAgent extends Thread {
 	private Auth agent;
 	private static int windowCount = 0;
 
-	private ArrayBlockingQueue<AuthWithWindowId> queue = new ArrayBlockingQueue<AuthWithWindowId>(1);
+	private ArrayBlockingQueue<AuthIdIp> queue = new ArrayBlockingQueue<>(1);
 
 	public ServerAgent(Socket agentSocket, Auth agent) {
 		this.agent = agent;
@@ -97,7 +97,7 @@ public class ServerAgent extends Thread {
 
 		private void sendCustomerToAgent() throws IOException, InterruptedException {
 			// send customer to agent, it will trigger opening window
-			AuthWithWindowId customer = queue.take();
+			AuthIdIp customer = queue.take();
 			System.out.println("Sending customer to agent: " + customer.toString());
 			ObjectOutputStream outputToAgent = new ObjectOutputStream(agentSocket.getOutputStream());
 			outputToAgent.writeObject(customer);
@@ -127,13 +127,13 @@ public class ServerAgent extends Thread {
 
 						// send agent to customer
 						ObjectOutputStream outputToCustomer = new ObjectOutputStream(client.getOutputStream());
-						AuthWithWindowId agentWId = new AuthWithWindowId(agent, tempWindowId);
+						AuthIdIp agentWId = new AuthIdIp(agent, tempWindowId, agentSocket.getInetAddress());
 						outputToCustomer.writeObject(agentWId);
 
 						BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
 						PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
 						pwToAgent.println(Flags.SENDING_CUSTOMER_TO_AGENT);
-						queue.put(new AuthWithWindowId(clientInfo.getAuth(), tempWindowId));
+						queue.put(new AuthIdIp(clientInfo.getAuth(), tempWindowId, client.getInetAddress()));
 
 						// customer to agent
 						boolean keepReceiving = true;

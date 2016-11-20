@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -18,6 +19,8 @@ import javax.sound.sampled.TargetDataLine;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import my.edu.taylors.dad.chat.entity.Ports;
+
 /**
  * For source see {@link VoiceServer}
  */
@@ -27,12 +30,15 @@ public class VoiceClient extends JFrame {
 	private boolean stopAudioCapture = false;
 	private ByteArrayOutputStream byteOutputStream; // for future replay
 	private TargetDataLine targetDataLine;
+	private final InetAddress inetAddress;
 
-	public static void main(String args[]) {
-		new VoiceClient().setVisible(true);
+	public static void main(String args[]) throws UnknownHostException {
+		new VoiceClient(InetAddress.getByName("127.0.0.1"));
 	}
 
-	public VoiceClient() {
+	public VoiceClient(InetAddress InetAddress) {
+		this.inetAddress = InetAddress;
+
 		final JButton capture = new JButton("Capture");
 		final JButton stop = new JButton("Stop");
 		final JButton play = new JButton("Playback");
@@ -69,9 +75,10 @@ public class VoiceClient extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(400, 100);
 		getContentPane().setBackground(Color.WHITE);
+		setVisible(true);
 	}
 
-	private void captureAudio() {
+	public void captureAudio() {
 		try {
 			AudioFormat adFormat = VoiceUtils.getAudioFormat();
 			DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, adFormat);
@@ -90,7 +97,7 @@ public class VoiceClient extends JFrame {
 		}
 	}
 
-	private void playAudio() {
+	public void playAudio() {
 		try {
 			byte aData[] = byteOutputStream.toByteArray();
 			InputStream byteInputStream = new ByteArrayInputStream(aData);
@@ -119,18 +126,17 @@ public class VoiceClient extends JFrame {
 		}
 
 		public void run() {
-			int order = 0;
+			//int order = 0;
 
 			byteOutputStream = new ByteArrayOutputStream();
 			stopAudioCapture = false;
-			try (DatagramSocket clientSocket = new DatagramSocket(8786)) {
+			try (DatagramSocket clientSocket = new DatagramSocket(Ports.VOICE_CLIENT)) {
 				// TODO add IP address from LoginMenu
-				InetAddress IPAddress = InetAddress.getByName("192.168.137.195");
 				while (!stopAudioCapture) {
 					int cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
-					tempBuffer[0] = (byte) order++;
+					//tempBuffer[0] = (byte) order++;
 					if (cnt > 0) {
-						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, IPAddress, 9786);
+						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, inetAddress, Ports.VOICE_SERVER);
 						clientSocket.send(sendPacket);
 						byteOutputStream.write(tempBuffer, 0, cnt);
 					}

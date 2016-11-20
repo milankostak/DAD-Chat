@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.Flags;
+import my.edu.taylors.dad.chat.entity.Ports;
 import my.edu.taylors.dad.chat.gsa.GsaClient;
 
 public class LoginMenu extends JFrame {
@@ -113,7 +114,7 @@ public class LoginMenu extends JFrame {
 	private void authenticate() {
 		Auth auth = getAuth();
 		try {
-			if (socket == null) socket = new Socket(serverIpAddress, 9999);
+			if (socket == null) socket = new Socket(serverIpAddress, Ports.MSG_SERVER);
 
 			// send credentials to server for authentication
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
@@ -128,12 +129,14 @@ public class LoginMenu extends JFrame {
 				case Flags.CUSTOMER_AUTHENTICATED_I:
 					new ClientCustomer(socket, auth);
 					this.setVisible(false);
+					this.dispose();
 					break;
 
 				// Agent
 				case Flags.AGENT_AUTHENTICATED_I:
 					new ClientAgent(socket, auth);
 					this.setVisible(false);
+					this.dispose();
 					break;
 
 				// too many attempts

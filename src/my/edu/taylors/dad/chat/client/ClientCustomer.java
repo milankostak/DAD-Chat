@@ -2,28 +2,33 @@ package my.edu.taylors.dad.chat.client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
+import my.edu.taylors.dad.chat.entity.AuthIdIp;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.CustomerGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
+import my.edu.taylors.dad.chat.voice.VoiceClient;
+import my.edu.taylors.dad.chat.voice.VoiceServer;
 
 public class ClientCustomer extends Thread {
 	
 	private JFrame waitingWindow;
 	private Socket socket;
 	private Auth authCustomer;
+	private InetAddress agentIp;
 
 	public ClientCustomer(Socket socket, Auth authCustomer) {
 		this.socket = socket;
 		this.authCustomer = authCustomer;
 		setupWaitingGui();
 		start();
+		new VoiceServer();
 	}
 	
 	private void setupWaitingGui() {
@@ -35,9 +40,11 @@ public class ClientCustomer extends Thread {
 	public void run() {
 		try {
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-			AuthWithWindowId agent = (AuthWithWindowId) ois.readObject();
+			AuthIdIp agent = (AuthIdIp) ois.readObject();
 			System.out.println("Customer received agent: " + agent.toString());
 			int agentWindowId = agent.getWindowId();
+			agentIp = agent.getInetAddress();
+			new VoiceClient(agentIp);
 			waitingWindow.setVisible(false);
 			CustomerGui gui = new CustomerGui(socket, "Customer: " + authCustomer.getUsername(), agentWindowId);
 			gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));

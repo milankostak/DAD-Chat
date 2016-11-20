@@ -11,6 +11,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
+import my.edu.taylors.dad.chat.entity.Ports;
+
 /**
  * Source: {@linkplain <a href="http://stackoverflow.com/revisions/17174202/2">http://stackoverflow.com/revisions/17174202/2</a>}<br>
  * Which is licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a><br>
@@ -25,22 +27,27 @@ import javax.sound.sampled.SourceDataLine;
  * 	<li>Listeners with lambdas</li>
  * </ul>
  */
-public class VoiceServer {
+public class VoiceServer extends Thread {
 
 	public static void main(String args[]) {
 		new VoiceServer();
 	}
-
+	
 	public VoiceServer() {
-		try (DatagramSocket serverSocket = new DatagramSocket(9786)) { 
+		start();
+	}
+
+	@Override
+	public void run() {
+		try (DatagramSocket serverSocket = new DatagramSocket(Ports.VOICE_SERVER)) { 
 			byte[] receiveData = new byte[10000];
 			while (true) {
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
-				System.out.print("RECEIVED: " + receivePacket.getAddress().getHostAddress() + " " + receivePacket.getPort());
+				System.out.println("RECEIVED: " + receivePacket.getAddress().getHostAddress() + ":" + receivePacket.getPort());
 				try {
 					byte aData[] = receivePacket.getData();
-					System.out.println(" order: "+aData[0]);
+					//System.out.println(" order: "+aData[0]);
 					InputStream byteInputStream = new ByteArrayInputStream(aData);
 
 					AudioFormat aFormat = VoiceUtils.getAudioFormat();

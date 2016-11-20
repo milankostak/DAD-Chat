@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import my.edu.taylors.dad.chat.entity.Ports;
+
 /**
  * Send broadcasts to every interface that is up and wait for response
  * Than get address from this response - it is the server address
@@ -25,7 +27,7 @@ public class GsaClient extends Thread {
 		String serverAddress = null;
 		try {
 			try {
-				serverConn = new ServerSocket(6869);
+				serverConn = new ServerSocket(Ports.GSA_CLIENT);
 				start();// start thread for sending requests
 				// then wait for reply
 				Socket socket = serverConn.accept();
@@ -73,8 +75,9 @@ public class GsaClient extends Thread {
 	}
 
 	private void sendBroadcast(InetAddress broadcastAddress) throws IOException {
+		//if (broadcastAddress.toString().equals("/127.255.255.255") || broadcastAddress.toString().equals("/169.254.255.255")) return;
 		byte[] buffer = {0};
-		DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, 6868);
+		DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, Ports.GSA_SERVER);
 		DatagramSocket dgSocket = new DatagramSocket();
 		dgSocket.send(packet);
 		dgSocket.close();

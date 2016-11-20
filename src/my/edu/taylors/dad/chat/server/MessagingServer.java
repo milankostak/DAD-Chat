@@ -10,6 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.ClientInfo;
 import my.edu.taylors.dad.chat.entity.Flags;
+import my.edu.taylors.dad.chat.entity.Ports;
 
 public class MessagingServer {
 	static Auth[] users = {
@@ -34,7 +35,7 @@ public class MessagingServer {
 		ServerSocket server = null;
 		try {
 			try {
-				server = new ServerSocket(9999);
+				server = new ServerSocket(Ports.MSG_SERVER);
 
 				while (true) {
 					Socket client = server.accept();

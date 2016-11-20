@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,19 +14,22 @@ import java.util.Map;
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.entity.AuthWithWindowId;
+import my.edu.taylors.dad.chat.entity.AuthIdIp;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.gui.AgentGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
+import my.edu.taylors.dad.chat.voice.VoiceClient;
+import my.edu.taylors.dad.chat.voice.VoiceServer;
 
 public class ClientAgent extends Thread {
 
 	private JFrame waitingFrame;
 	public static Map<Integer, AgentGui> windows = new HashMap<>(2);
-	private Auth agent;
 
+	private Auth agent;
+	private InetAddress customerIp;
 	private Socket socket;
 
 	public ClientAgent(Socket socket, Auth agent) {
@@ -33,13 +37,14 @@ public class ClientAgent extends Thread {
 		this.agent = agent;
 		setupWaitingGui();
 		start();
+		new VoiceServer();
 	}
 
 	private void setupWaitingGui() {		
 		waitingFrame = new WaitingWindow(" Please wait for a client to connect.");
 		waitingFrame.setVisible(true);
 	}
-	
+
 	public static void sendBoth(String message) {
 		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
 			AgentGui gui = entry.getValue();
@@ -106,11 +111,13 @@ public class ClientAgent extends Thread {
 		writer.println(Flags.SENDING_CUSTOMER_TO_AGENT);
 		
 		ObjectInputStream ios = new ObjectInputStream(socket.getInputStream());
-		AuthWithWindowId customer = (AuthWithWindowId) ios.readObject();
+		AuthIdIp customer = (AuthIdIp) ios.readObject();
 		System.out.println("Agent received customer: " + customer.toString());
 
 		int clientId = customer.getId();
 		int windowId = customer.getWindowId();
+		customerIp = customer.getInetAddress();
+		new VoiceClient(customerIp);
 
 		AgentGui gui = new AgentGui(this, socket, customer.getUsername(), clientId, agent.getUsername());
 		windows.put(windowId, gui);

@@ -6,6 +6,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
 
+import my.edu.taylors.dad.chat.entity.Ports;
+
 /**
  * Keep sending address to every client that wants it
  */
@@ -19,7 +21,7 @@ public class GsaServer extends Thread {
 	public void run() {
 		DatagramSocket dgSocket = null;
 		try {
-			dgSocket = new DatagramSocket(6868);
+			dgSocket = new DatagramSocket(Ports.GSA_SERVER);
 
 			while(true) {
 				byte[] buffer = new byte[1];
@@ -29,7 +31,7 @@ public class GsaServer extends Thread {
 				
 				Socket socket = null;
 				try {
-					socket = new Socket(packet.getAddress(), 6869);
+					socket = new Socket(packet.getAddress(), Ports.GSA_CLIENT);
 				} catch (ConnectException e) {
 					System.err.println("ConnectException");
 					System.err.println("Client already received server address through other its interface.");
