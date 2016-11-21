@@ -33,7 +33,7 @@ public class AuthIdIp extends Auth implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Agent [windowId=" + windowId + ", inetAddress=" + inetAddress + ", getType()=" + getType()
+		return "AuthIdIp [windowId=" + windowId + ", inetAddress=" + inetAddress + ", getType()=" + getType()
 				+ ", getUsername()=" + getUsername() + ", getPassword()=" + getPassword() + ", getId()=" + getId()
 				+ "]";
 	}
