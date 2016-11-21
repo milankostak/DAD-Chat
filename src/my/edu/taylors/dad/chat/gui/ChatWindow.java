@@ -46,11 +46,11 @@ public abstract class ChatWindow extends JFrame {
 
 	private boolean isLoggingOut;
 
-	public ChatWindow(String title, ClientType clientType, InetAddress IP) {
+	public ChatWindow(String title, ClientType clientType, InetAddress IP, int port) {
 		this.clientType = clientType;
 		this.isLoggingOut = false;
 		setUpGui(title);
-		voiceClient = new VoiceClient(IP);
+		voiceClient = new VoiceClient(IP, port);
 	}
 
 	/**
@@ -189,7 +189,7 @@ public abstract class ChatWindow extends JFrame {
 		btStop.setMnemonic(KeyEvent.VK_P);
 		btStop.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btStop.addActionListener(e -> stopCapture());
-		btSend.setEnabled(false);
+		btStop.setEnabled(false);
 		voiceLeftPanel.add(btStop);
 		
 		voicePanel.add(voiceLeftPanel, BorderLayout.WEST);
@@ -208,7 +208,7 @@ public abstract class ChatWindow extends JFrame {
 	 */
 	private void startCapture() {
 		btCapture.setEnabled(false);
-		btSend.setEnabled(true);
+		btStop.setEnabled(true);
 
 		voiceClient.captureAudio();
 	}
@@ -218,7 +218,7 @@ public abstract class ChatWindow extends JFrame {
 	 */
 	private void stopCapture() {
 		btCapture.setEnabled(true);
-		btSend.setEnabled(false);
+		btStop.setEnabled(false);
 
 		byte[] voiceData = voiceClient.stopCapture();
 		addMessage(new Message(voiceData, ClientType.ME));

@@ -22,10 +22,12 @@ public class VoiceClient {
 	private volatile ByteArrayOutputStream byteOutputStream;
 	private TargetDataLine targetDataLine;
 	private final InetAddress inetAddress;
+	private final int serverPort;
 
-	public VoiceClient(InetAddress InetAddress) {
+	public VoiceClient(InetAddress InetAddress, int serverPort) {
 		this.inetAddress = InetAddress;
-		isCaptureRunning = false;
+		this.isCaptureRunning = false;
+		this.serverPort = serverPort;
 	}
 	
 	public byte[] stopCapture() {
@@ -68,7 +70,7 @@ public class VoiceClient {
 					int count = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
 
 					if (count > 0) {
-						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, inetAddress, Ports.VOICE_SERVER);
+						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, inetAddress, serverPort);
 						clientSocket.send(sendPacket);
 						byteOutputStream.write(tempBuffer, 0, count);
 					}

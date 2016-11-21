@@ -14,6 +14,7 @@ import my.edu.taylors.dad.chat.entity.AuthIdIp;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
+import my.edu.taylors.dad.chat.entity.Ports;
 import my.edu.taylors.dad.chat.gui.CustomerGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
 import my.edu.taylors.dad.chat.voice.VoiceServer;
@@ -31,7 +32,7 @@ public class ClientCustomer extends Thread {
 		this.socket = socket;
 		this.authCustomer = authCustomer;
 		setupWaitingGui();
-		voiceServer = new VoiceServer();
+		voiceServer = new VoiceServer(Ports.VOICE_SERVER_CUSTOMER);
 		start();
 	}
 

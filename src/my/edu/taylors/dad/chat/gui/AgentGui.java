@@ -17,6 +17,7 @@ import my.edu.taylors.dad.chat.client.LoginMenu;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
+import my.edu.taylors.dad.chat.entity.Ports;
 import my.edu.taylors.dad.chat.saving.ISaver;
 
 public class AgentGui extends ChatWindow {
@@ -31,7 +32,7 @@ public class AgentGui extends ChatWindow {
 	private String customerName, agentName;
 
 	public AgentGui(ClientAgent clientAgent, Socket socket, String customerName, int clientId, String agentName, InetAddress IP) {
-		super("Agent: conversation with customer " + customerName, ClientType.AGENT, IP);
+		super("Agent: conversation with customer " + customerName, ClientType.AGENT, IP, Ports.VOICE_SERVER_CUSTOMER);
 		this.clientAgent = clientAgent;
 		this.socket = socket;
 		this.customerName = customerName;

@@ -6,8 +6,6 @@ import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-import my.edu.taylors.dad.chat.entity.Ports;
-
 /**
  * Source: {@linkplain <a href="http://stackoverflow.com/revisions/17174202/2">http://stackoverflow.com/revisions/17174202/2</a>}<br>
  * Which is licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a><br>
@@ -30,9 +28,11 @@ public class VoiceServer extends Thread {
 
 	private volatile ByteArrayOutputStream byteOutputStream;
 	private volatile boolean cleared;
+	private final int serverPort;
 
-	public VoiceServer() {
-		cleared = true;
+	public VoiceServer(int serverPort) {
+		this.cleared = true;
+		this.serverPort = serverPort;
 		start();
 	}
 
@@ -43,7 +43,7 @@ public class VoiceServer extends Thread {
 
 	@Override
 	public void run() {
-		try (DatagramSocket serverSocket = new DatagramSocket(Ports.VOICE_SERVER)) {
+		try (DatagramSocket serverSocket = new DatagramSocket(serverPort)) {
 
 			byte[] receiveData = new byte[3000];
 

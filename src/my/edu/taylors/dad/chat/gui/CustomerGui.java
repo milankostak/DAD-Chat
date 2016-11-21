@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
+import my.edu.taylors.dad.chat.entity.Ports;
 
 public class CustomerGui extends ChatWindow {
 	private static final long serialVersionUID = 1L;
@@ -22,7 +23,7 @@ public class CustomerGui extends ChatWindow {
 	private int otherSideId;
 
 	public CustomerGui(Socket socket, String title, int otherSideId, InetAddress IP) {
-		super(title, ClientType.CUSTOMER, IP);
+		super(title, ClientType.CUSTOMER, IP, Ports.VOICE_SERVER_AGENT);
 		this.socket = socket;
 		this.otherSideId = otherSideId;
 		setupWriter();
