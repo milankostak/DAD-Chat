@@ -72,7 +72,7 @@ public class GsaClient extends Thread {
 	}
 
 	private void sendBroadcast(InetAddress broadcastAddress) throws IOException {
-		//if (broadcastAddress.toString().equals("/127.255.255.255") || broadcastAddress.toString().equals("/169.254.255.255")) return;
+		if (broadcastAddress.toString().equals("/127.255.255.255") || broadcastAddress.toString().equals("/169.254.255.255")) return;
 		byte[] buffer = {0};
 		DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, Ports.GSA_SERVER);
 		DatagramSocket dgSocket = new DatagramSocket();

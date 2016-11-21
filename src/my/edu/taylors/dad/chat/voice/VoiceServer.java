@@ -45,19 +45,20 @@ public class VoiceServer extends Thread {
 	public void run() {
 		try (DatagramSocket serverSocket = new DatagramSocket(serverPort)) {
 
-			byte[] receiveData = new byte[3000];
+			byte[] receiveData = new byte[500];
 
 			while (true) {
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
 				System.out.println("RECEIVED: " + receivePacket.getAddress().getHostAddress() + ":" + receivePacket.getPort());
-
+				
 				if (cleared) {
 					byteOutputStream = new ByteArrayOutputStream();
 					cleared = false;
 				}
 
 				byte aData[] = receivePacket.getData();
+				//System.out.println("ORDER: "+aData[0]);
 				byteOutputStream.write(aData, 0, receivePacket.getLength());
 			}
 		} catch (BindException e) {

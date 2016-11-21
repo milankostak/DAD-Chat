@@ -59,7 +59,8 @@ public class VoiceClient {
 		}
 
 		public void run() {
-			byte[] tempBuffer = new byte[3000];
+			byte[] tempBuffer = new byte[500];
+			//int aa = 0;
 
 			byteOutputStream = new ByteArrayOutputStream();
 			isCaptureRunning = true;
@@ -68,9 +69,10 @@ public class VoiceClient {
 
 				while (isCaptureRunning) {
 					int count = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
-
+					//tempBuffer[0] = (byte) aa++;
 					if (count > 0) {
-						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, inetAddress, serverPort);
+						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length,
+								InetAddress.getByName("192.168.137.255"), serverPort);
 						clientSocket.send(sendPacket);
 						byteOutputStream.write(tempBuffer, 0, count);
 					}
