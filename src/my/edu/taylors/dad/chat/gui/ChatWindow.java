@@ -10,7 +10,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 
 import javax.swing.BorderFactory;
@@ -190,6 +189,7 @@ public abstract class ChatWindow extends JFrame {
 		btStop.setMnemonic(KeyEvent.VK_P);
 		btStop.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btStop.addActionListener(e -> stopCapture());
+		btSend.setEnabled(false);
 		voiceLeftPanel.add(btStop);
 		
 		voicePanel.add(voiceLeftPanel, BorderLayout.WEST);
@@ -207,6 +207,9 @@ public abstract class ChatWindow extends JFrame {
 	 * Method for start of capturing
 	 */
 	private void startCapture() {
+		btCapture.setEnabled(false);
+		btSend.setEnabled(true);
+
 		voiceClient.captureAudio();
 	}
 
@@ -214,7 +217,10 @@ public abstract class ChatWindow extends JFrame {
 	 * Stop capturing, add message to window
 	 */
 	private void stopCapture() {
-		ByteArrayOutputStream voiceData = voiceClient.stopCapture();
+		btCapture.setEnabled(true);
+		btSend.setEnabled(false);
+
+		byte[] voiceData = voiceClient.stopCapture();
 		addMessage(new Message(voiceData, ClientType.ME));
 		sendVoiceFinished();
 	}

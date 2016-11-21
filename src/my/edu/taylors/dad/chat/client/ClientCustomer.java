@@ -1,7 +1,6 @@
 package my.edu.taylors.dad.chat.client;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -79,7 +78,7 @@ public class ClientCustomer extends Thread {
 						gui.logOut(new Message("Customer ended the conversation", ClientType.ME));
 
 					} else if (flag.equals(Flags.VOICE_CAPTURE_FINISHED)) {
-						ByteArrayOutputStream voiceData = voiceServer.getByteOutputStream();
+						byte[] voiceData = voiceServer.getByteOutputStream();
 						Message msg = new Message(voiceData, ClientType.NOT_ME);
 						gui.addMessage(msg);
 						

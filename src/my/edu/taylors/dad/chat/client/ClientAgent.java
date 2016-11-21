@@ -2,7 +2,6 @@ package my.edu.taylors.dad.chat.client;
 
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -75,7 +74,7 @@ public class ClientAgent extends Thread {
 				} else if (message.equals(Flags.VOICE_CAPTURE_FINISHED)) {
 					String customerId = fromServer.readLine();
 					AgentGui agentGui = windows.get(Integer.parseInt(customerId));
-					ByteArrayOutputStream voiceData = voiceServer.getByteOutputStream();
+					byte[] voiceData = voiceServer.getByteOutputStream();
 					Message msg = new Message(voiceData, ClientType.NOT_ME);
 					if (agentGui != null) {
 						agentGui.addMessage(msg);

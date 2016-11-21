@@ -23,28 +23,29 @@ import my.edu.taylors.dad.chat.entity.Ports;
  * 	<li>VoiceServe extends a Thread now</li>
  * 	<li>Completely removed GUI</li>
  * 	<li>Server now doesn't play immediately, but stores the sound for later play</li>
+ * 	<li>Memory synchronization (volatile) </li>
  * </ul>
  */
 public class VoiceServer extends Thread {
 
 	private volatile ByteArrayOutputStream byteOutputStream;
-	private boolean cleared;
+	private volatile boolean cleared;
 
 	public VoiceServer() {
 		cleared = true;
 		start();
 	}
 
-	public ByteArrayOutputStream getByteOutputStream() {
+	public byte[] getByteOutputStream() {
 		cleared = true;
-		return byteOutputStream;
+		return byteOutputStream.toByteArray();
 	}
 
 	@Override
 	public void run() {
-		try (DatagramSocket serverSocket = new DatagramSocket(Ports.VOICE_SERVER)) { 
+		try (DatagramSocket serverSocket = new DatagramSocket(Ports.VOICE_SERVER)) {
 
-			byte[] receiveData = new byte[10000];
+			byte[] receiveData = new byte[3000];
 
 			while (true) {
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);

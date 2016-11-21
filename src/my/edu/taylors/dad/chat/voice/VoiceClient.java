@@ -18,19 +18,20 @@ import my.edu.taylors.dad.chat.entity.Ports;
  */
 public class VoiceClient {
 
-	private boolean isCaptureRunning = false;
-	private ByteArrayOutputStream byteOutputStream; // for future replay
+	private volatile boolean isCaptureRunning;
+	private volatile ByteArrayOutputStream byteOutputStream;
 	private TargetDataLine targetDataLine;
 	private final InetAddress inetAddress;
 
 	public VoiceClient(InetAddress InetAddress) {
 		this.inetAddress = InetAddress;
+		isCaptureRunning = false;
 	}
 	
-	public ByteArrayOutputStream stopCapture() {
+	public byte[] stopCapture() {
 		isCaptureRunning = false;
 		targetDataLine.close();
-		return byteOutputStream;
+		return byteOutputStream.toByteArray();
 	}
 
 	public void captureAudio() {
@@ -50,26 +51,26 @@ public class VoiceClient {
 	}
 
 	private class VoiceCaptureThread extends Thread {
-	
-		byte tempBuffer[] = new byte[10000];
 
 		public VoiceCaptureThread() {
 			start();
 		}
 
 		public void run() {
-			//int order = 0;
+			byte[] tempBuffer = new byte[3000];
 
 			byteOutputStream = new ByteArrayOutputStream();
 			isCaptureRunning = true;
+
 			try (DatagramSocket clientSocket = new DatagramSocket(Ports.VOICE_CLIENT)) {
+
 				while (isCaptureRunning) {
-					int cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
-					//tempBuffer[0] = (byte) order++;
-					if (cnt > 0) {
+					int count = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
+
+					if (count > 0) {
 						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, inetAddress, Ports.VOICE_SERVER);
 						clientSocket.send(sendPacket);
-						byteOutputStream.write(tempBuffer, 0, cnt);
+						byteOutputStream.write(tempBuffer, 0, count);
 					}
 				}
 				byteOutputStream.close();

@@ -1,6 +1,5 @@
 package my.edu.taylors.dad.chat.entity;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,7 +16,7 @@ public class Message implements Serializable {
 	
 	private MessageType messageType;
 	
-	private transient ByteArrayOutputStream voiceData;
+	private transient byte[] voiceData;
 
 	public Message(String message, ClientType clientType) {
 		this(new Date(), message, clientType);
@@ -30,11 +29,11 @@ public class Message implements Serializable {
 		messageType = MessageType.TEXT;
 	}
 
-	public Message(ByteArrayOutputStream voiceData, ClientType clientType) {
+	public Message(byte[] voiceData, ClientType clientType) {
 		this(new Date(), voiceData, clientType);
 	}
 
-	public Message(Date time, ByteArrayOutputStream voiceData, ClientType clientType) {
+	public Message(Date time, byte[] voiceData, ClientType clientType) {
 		this.time = time;
 		this.voiceData = voiceData;
 		this.clientType = clientType;
@@ -77,18 +76,22 @@ public class Message implements Serializable {
 		this.messageType = messageType;
 	}
 
-	public ByteArrayOutputStream getVoiceData() {
+	public byte[] getVoiceData() {
 		return voiceData;
 	}
 
-	public void setVoiceData(ByteArrayOutputStream voiceData) {
+	public void setVoiceData(byte[] voiceData) {
 		this.voiceData = voiceData;
 	}
 
 	@Override
 	public String toString() {
-		return "Message [time=" + prepareTime() + ", message=" + message + ", clientType=" + clientType + ", messageType="
+		return "Message [time=" + time + ", message=" + message + ", clientType=" + clientType + ", messageType="
 				+ messageType + ", voiceData=" + voiceData + "]";
+	}
+
+	public String toStringForLog() {
+ 		return prepareTime() + "  " + message;
 	}
 
 	/**
