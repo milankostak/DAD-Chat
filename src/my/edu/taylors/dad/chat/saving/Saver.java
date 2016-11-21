@@ -31,7 +31,7 @@ public class Saver extends UnicastRemoteObject implements ISaver {
 			for (int i = 0; i < messages.size(); i++) {
 				Message msg = messages.get(i);
 				String who = msg.getClientType() == ClientType.ME ? "Agent " + agentName : "Customer " + customerName;
-				writer.println(who + ": "  + msg.toString());
+				writer.println(who + ": "  + msg.toStringForLog());
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

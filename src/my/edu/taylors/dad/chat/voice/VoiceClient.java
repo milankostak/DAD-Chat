@@ -24,8 +24,8 @@ public class VoiceClient {
 	private final InetAddress inetAddress;
 	private final int serverPort;
 
-	public VoiceClient(InetAddress InetAddress, int serverPort) {
-		this.inetAddress = InetAddress;
+	public VoiceClient(InetAddress inetAddress, int serverPort) {
+		this.inetAddress = inetAddress;
 		this.isCaptureRunning = false;
 		this.serverPort = serverPort;
 	}
@@ -60,7 +60,6 @@ public class VoiceClient {
 
 		public void run() {
 			byte[] tempBuffer = new byte[500];
-			//int aa = 0;
 
 			byteOutputStream = new ByteArrayOutputStream();
 			isCaptureRunning = true;
@@ -69,7 +68,7 @@ public class VoiceClient {
 
 				while (isCaptureRunning) {
 					int count = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
-					//tempBuffer[0] = (byte) aa++;
+
 					if (count > 0) {
 						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length,
 								InetAddress.getByName("192.168.137.255"), serverPort);

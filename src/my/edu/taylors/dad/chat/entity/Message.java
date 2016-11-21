@@ -13,9 +13,9 @@ public class Message implements Serializable {
 	private String message;
 	// who sent it, used for showing on either left or right side of chat window
 	private ClientType clientType;
-	
+	// type of message - either voice or text
 	private MessageType messageType;
-	
+	// if type of message is voice, then it is stored here
 	private transient byte[] voiceData;
 
 	public Message(String message, ClientType clientType) {
@@ -90,8 +90,17 @@ public class Message implements Serializable {
 				+ messageType + ", voiceData=" + voiceData + "]";
 	}
 
+	/**
+	 * To String method for saving to LOG<br>
+	 * Takes into consideration if the message was voice or text
+	 * @return text with time either containing message or describing it (for voice message)
+	 */
 	public String toStringForLog() {
- 		return prepareTime() + "  " + message;
+		if (messageType == MessageType.TEXT) {
+	 		return prepareTime() + "  " + message;
+		} else {
+	 		return prepareTime() + "  voice message";
+		}
 	}
 
 	/**
