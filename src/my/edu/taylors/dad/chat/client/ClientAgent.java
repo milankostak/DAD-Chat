@@ -14,8 +14,8 @@ import java.util.Map;
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.entity.AuthIdIp;
 import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Customer;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.entity.Ports;
@@ -128,7 +128,7 @@ public class ClientAgent extends Thread {
 		writer.println(Flags.SENDING_CUSTOMER_TO_AGENT);
 		
 		ObjectInputStream ios = new ObjectInputStream(socket.getInputStream());
-		AuthIdIp customer = (AuthIdIp) ios.readObject();
+		Customer customer = (Customer) ios.readObject();
 		System.out.println("Agent received customer: " + customer.toString());
 
 		int clientId = customer.getId();

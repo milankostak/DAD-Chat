@@ -12,22 +12,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.entity.AuthIdIp;
-import my.edu.taylors.dad.chat.entity.ClientInfo;
+import my.edu.taylors.dad.chat.entity.Agent;
+import my.edu.taylors.dad.chat.entity.Customer;
+import my.edu.taylors.dad.chat.entity.CustomerInfo;
 import my.edu.taylors.dad.chat.entity.Flags;
 
 public class ServerAgent extends Thread {
 
 	private Map<Integer, Socket> customersMap = new HashMap<>(2);
-	private Auth agent;
+	private Agent agent;
 	public volatile boolean isAgentConnected;
 	private static int windowCount = 0;
 
-	private ArrayBlockingQueue<AuthIdIp> queue = new ArrayBlockingQueue<>(1);
+	private ArrayBlockingQueue<Customer> queue = new ArrayBlockingQueue<>(1);
 
-	public ServerAgent(Socket agentSocket, Auth agent) {
-		this.agent = agent;
+	public ServerAgent(Socket agentSocket, Agent authenticatedUser) {
+		this.agent = authenticatedUser;
 		this.isAgentConnected = true;
 
 		for (int i = 0; i < 2; i++) {
@@ -108,7 +108,7 @@ public class ServerAgent extends Thread {
 
 		private void sendCustomerToAgent() throws IOException, InterruptedException {
 			// send customer to agent, it will trigger opening window
-			AuthIdIp customer = queue.take();
+			Customer customer = queue.take();
 			System.out.println("Sending customer to agent: " + customer.toString());
 			ObjectOutputStream outputToAgent = new ObjectOutputStream(agentSocket.getOutputStream());
 			outputToAgent.writeObject(customer);
@@ -116,7 +116,7 @@ public class ServerAgent extends Thread {
 	}
 	
 	private class CustomerToAgentHandler extends Thread {
-		private ClientInfo clientInfo;
+		private CustomerInfo customerInfo;
 		private Socket agentSocket;
 		private int tempWindowId;
 		private Socket client = null;
@@ -131,27 +131,27 @@ public class ServerAgent extends Thread {
 			try {
 				try {
 					while (isAgentConnected) {
-						clientInfo = MessagingServer.connectionQueue.take();
+						customerInfo = MessagingServer.connectionQueue.take();
 						
 						// when agent disconnects unexpectedly, this two thread keep running
 						// stop them and re-put clients into queue
 						if (!isAgentConnected) {
-							MessagingServer.connectionQueue.put(clientInfo);
+							MessagingServer.connectionQueue.put(customerInfo);
 							break;
 						}
 						tempWindowId = windowCount++;
-						client = clientInfo.getSocket();
-						customersMap.put(clientInfo.getAuth().getId(), client);
+						client = customerInfo.getSocket();
+						customersMap.put(customerInfo.getCustomer().getId(), client);
 
 						// send agent to customer
 						ObjectOutputStream outputToCustomer = new ObjectOutputStream(client.getOutputStream());
-						AuthIdIp agentWId = new AuthIdIp(agent, tempWindowId, agentSocket.getInetAddress());
+						Agent agentWId = new Agent(agent, tempWindowId, agentSocket.getInetAddress());
 						outputToCustomer.writeObject(agentWId);
 
 						BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
 						PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
 						pwToAgent.println(Flags.SENDING_CUSTOMER_TO_AGENT);
-						queue.put(new AuthIdIp(clientInfo.getAuth(), tempWindowId, client.getInetAddress()));
+						queue.put(new Customer(customerInfo.getCustomer(), tempWindowId, client.getInetAddress()));
 
 						// customer to agent
 						boolean keepReceiving = true;

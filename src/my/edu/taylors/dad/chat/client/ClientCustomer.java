@@ -9,8 +9,8 @@ import java.net.Socket;
 
 import javax.swing.JFrame;
 
+import my.edu.taylors.dad.chat.entity.Agent;
 import my.edu.taylors.dad.chat.entity.Auth;
-import my.edu.taylors.dad.chat.entity.AuthIdIp;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
@@ -45,7 +45,7 @@ public class ClientCustomer extends Thread {
 	public void run() {
 		try {// TODO StreamCorruptedException
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-			AuthIdIp agent = (AuthIdIp) ois.readObject();
+			Agent agent = (Agent) ois.readObject();
 			System.out.println("Customer received agent: " + agent.toString());
 			int agentWindowId = agent.getWindowId();
 			InetAddress agentIp = agent.getInetAddress();

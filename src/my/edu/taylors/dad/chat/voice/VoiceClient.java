@@ -63,7 +63,7 @@ public class VoiceClient {
 
 			try (MulticastSocket multicastSocket = new MulticastSocket();) {
 
-				multicastSocket.setInterface(InetAddress.getByName("192.168.0.103"));
+				multicastSocket.setInterface(InetAddress.getByName("192.168.137.207"));
 				InetAddress multicastgroupAddress = InetAddress.getByName("235.1.1.1");
 				
 				while (isCaptureRunning) {

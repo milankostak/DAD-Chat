@@ -47,7 +47,7 @@ public class VoiceServer extends Thread {
 		try (MulticastSocket serverSocket = new MulticastSocket(serverPort)) {
 
 			InetAddress multicastgroupAddress = InetAddress.getByName("235.1.1.1");
-			serverSocket.setInterface(InetAddress.getByName("192.168.0.103"));
+			serverSocket.setInterface(InetAddress.getByName("192.168.137.207"));
 			serverSocket.joinGroup(multicastgroupAddress);
 
 			byte[] receiveData = new byte[VoiceUtils.PACKET_SIZE];
