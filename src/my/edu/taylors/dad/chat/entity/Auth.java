@@ -118,4 +118,10 @@ public class Auth implements Serializable {
 		return found;
 	}
 
+	@Override
+	public String toString() {
+		return "Auth [username=" + username + ", password=" + password + ", clientType=" + clientType + ", id=" + id
+				+ ", windowId=" + windowId + ", inetAddress=" + inetAddress + "]";
+	}
+
 }

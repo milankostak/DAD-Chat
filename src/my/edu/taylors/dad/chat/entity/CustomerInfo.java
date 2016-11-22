@@ -29,7 +29,7 @@ public class CustomerInfo {
 
 	@Override
 	public String toString() {
-		return "ClientInfo [customer=" + customer + ", socket=" + socket + "]";
+		return "CustomerInfo [customer=" + customer + ", socket=" + socket + "]";
 	}
 
 }
