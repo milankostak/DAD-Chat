@@ -10,21 +10,21 @@ import java.net.Socket;
 import my.edu.taylors.dad.chat.entity.Ports;
 
 /**
- * Keep sending address to every client that wants it
+ * Keep sending address to every client that asks for it
  */
 public class GsaServer extends Thread {
 
 	public GsaServer() {
 		start();
 	}
-	
+
 	@Override
 	public void run() {
 		try (DatagramSocket dgSocket = new DatagramSocket(Ports.GSA_SERVER)) {
 
 			while(true) {
 				byte[] buffer = new byte[1];
-				
+
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 				dgSocket.receive(packet);
 
@@ -35,6 +35,7 @@ public class GsaServer extends Thread {
 					System.err.println("Client already received server address through other its interface.");
 				}
 			}
+
 		} catch (BindException e) {
 			System.err.println("There is already a server running on this port. Server is shuting down.");
 			e.printStackTrace();

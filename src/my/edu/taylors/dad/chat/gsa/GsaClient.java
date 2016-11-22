@@ -23,7 +23,7 @@ import my.edu.taylors.dad.chat.entity.Ports;
 public class GsaClient extends Thread {
 
 	private volatile boolean addressReceived = false;
-	
+
 	public String getAddress() {
 		String serverAddress = null;
 		try {
@@ -32,7 +32,7 @@ public class GsaClient extends Thread {
 				start();// start thread for sending requests
 				// then wait for reply
 				Socket socket = serverConn.accept();
-				
+
 				serverAddress = socket.getInetAddress().getHostAddress();
 				System.out.println("Received server address: " + serverAddress);
 				addressReceived = true;
@@ -41,32 +41,32 @@ public class GsaClient extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return serverAddress;
 	}
-	
+
 	@Override
 	public void run() {
 		int counter = 0;
 		int limit = 5;
-		while(!addressReceived) {
+		while (!addressReceived) {
 			try {
 				List<InetAddress> broadcastAddresss = new ArrayList<>();
-		
+
 				Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-		
+
 				while (interfaces.hasMoreElements()) {
-					// hw interface
+					// HW interface
 					NetworkInterface interf = (NetworkInterface) interfaces.nextElement();
 					if (interf.isUp()) {
-		
+
 						for (InterfaceAddress address : interf.getInterfaceAddresses()) {
 							if (address.getBroadcast() != null) {
 								broadcastAddresss.add(address.getBroadcast());
 							}
 						}
 		
-				    }
+					}
 				}
 
 				for (int i = 0; i < broadcastAddresss.size(); i++) {

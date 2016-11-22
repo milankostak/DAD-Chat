@@ -50,7 +50,6 @@ public class ClientCustomer extends Thread {
 		try {
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 			Agent agent = (Agent) ois.readObject();
-			customer.setAgent(agent);
 			System.out.println("Customer received agent: " + agent.toString());
 
 			voiceServer = new VoiceServer(Ports.VOICE_SERVER_CUSTOMER, customer.getInetAddress(), agent.getMulticastAddress());

@@ -1,11 +1,16 @@
 package my.edu.taylors.dad.chat.entity;
 
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * Class for storing {@link Customer} information together with his socket inside {@link ArrayBlockingQueue}
+ */
 public class CustomerInfo {
+
 	private Customer customer;
 	private Socket socket;
-	
+
 	public CustomerInfo(Customer customer, Socket socket) {
 		this.customer = customer;
 		this.socket = socket;

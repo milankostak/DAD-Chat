@@ -2,6 +2,9 @@ package my.edu.taylors.dad.chat.entity;
 
 import java.io.Serializable;
 
+/**
+ * Class for sending {@link Auth} object the result of authentication
+ */
 public class AuthResult implements Serializable {
 	private static final long serialVersionUID = 1L;
 

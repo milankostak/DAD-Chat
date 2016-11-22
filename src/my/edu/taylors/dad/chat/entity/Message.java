@@ -4,9 +4,13 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Entity class for storing information about message.<br>
+ * Stores either text or voice message.
+ */
 public class Message implements Serializable {
-
 	private static final long serialVersionUID = 1L;
+
 	// time of message, just for showing in GUI
 	private Date time;
 	// content of the message
@@ -18,6 +22,11 @@ public class Message implements Serializable {
 	// if type of message is voice, then it is stored here
 	private transient byte[] voiceData;
 
+	/**
+	 * Basic constructor for text message
+	 * @param message
+	 * @param clientType
+	 */
 	public Message(String message, ClientType clientType) {
 		this(new Date(), message, clientType);
 	}
@@ -29,6 +38,11 @@ public class Message implements Serializable {
 		messageType = MessageType.TEXT;
 	}
 
+	/**
+	 * Basic constructor for voice message
+	 * @param voiceData
+	 * @param clientType
+	 */
 	public Message(byte[] voiceData, ClientType clientType) {
 		this(new Date(), voiceData, clientType);
 	}
