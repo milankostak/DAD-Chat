@@ -4,7 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 
 /**
  * Source: {@linkplain <a href="http://stackoverflow.com/revisions/17174202/2">http://stackoverflow.com/revisions/17174202/2</a>}<br>
@@ -43,7 +44,11 @@ public class VoiceServer extends Thread {
 
 	@Override
 	public void run() {
-		try (DatagramSocket serverSocket = new DatagramSocket(serverPort)) {
+		try (MulticastSocket serverSocket = new MulticastSocket(serverPort)) {
+
+			InetAddress multicastgroupAddress = InetAddress.getByName("235.1.1.1");
+			serverSocket.setInterface(InetAddress.getByName("192.168.0.103"));
+			serverSocket.joinGroup(multicastgroupAddress);
 
 			byte[] receiveData = new byte[VoiceUtils.PACKET_SIZE];
 
@@ -58,7 +63,6 @@ public class VoiceServer extends Thread {
 				}
 
 				byte aData[] = receivePacket.getData();
-				//System.out.println("ORDER: "+aData[0]);
 				byteOutputStream.write(aData, 0, receivePacket.getLength());
 			}
 		} catch (BindException e) {

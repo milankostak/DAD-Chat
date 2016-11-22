@@ -2,8 +2,8 @@ package my.edu.taylors.dad.chat.voice;
 
 import java.io.ByteArrayOutputStream;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -20,11 +20,9 @@ public class VoiceClient {
 	private volatile ByteArrayOutputStream byteOutputStream;
 	private TargetDataLine targetDataLine;
 
-	private final InetAddress inetAddress;
 	private final int serverPort;
 
 	public VoiceClient(InetAddress inetAddress, int serverPort) {
-		this.inetAddress = inetAddress;
 		this.isCaptureRunning = false;
 		this.serverPort = serverPort;
 	}
@@ -63,17 +61,21 @@ public class VoiceClient {
 			byteOutputStream = new ByteArrayOutputStream();
 			isCaptureRunning = true;
 
-			try (DatagramSocket clientSocket = new DatagramSocket()) {
+			try (MulticastSocket multicastSocket = new MulticastSocket();) {
 
+				multicastSocket.setInterface(InetAddress.getByName("192.168.0.103"));
+				InetAddress multicastgroupAddress = InetAddress.getByName("235.1.1.1");
+				
 				while (isCaptureRunning) {
 					int count = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
 
 					if (count > 0) {
 						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length,
-								InetAddress.getByName("192.168.0.255"), serverPort);
-						clientSocket.send(sendPacket);
+								multicastgroupAddress, serverPort);
+						multicastSocket.send(sendPacket);
 						byteOutputStream.write(tempBuffer, 0, count);
 					}
+
 				}
 				byteOutputStream.close();
 			} catch (Exception e) {
