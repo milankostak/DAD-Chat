@@ -8,7 +8,7 @@ import javax.swing.AbstractListModel;
 import my.edu.taylors.dad.chat.entity.Message;
 
 /**
- * Custom list mode, because of custom chat renderer where it is better to receive whole {@link Message} object
+ * Custom list model, because of custom chat renderer where it is better to receive whole {@link Message} object
  */
 public class ChatListModel extends AbstractListModel<Message> {
 	private static final long serialVersionUID = 1L;

@@ -18,7 +18,7 @@ import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.entity.MessageType;
 
 /**
- * Custom chat window renderer to show message in nicer way
+ * Custom chat window renderer to show message in a nicer way
  */
 public class ChatRenderer implements ListCellRenderer<Message> {
 

@@ -31,6 +31,11 @@ import my.edu.taylors.dad.chat.entity.MessageType;
 import my.edu.taylors.dad.chat.voice.VoiceClient;
 import my.edu.taylors.dad.chat.voice.VoicePlayThread;
 
+/**
+ * Abstract class for implementing chat GUI window<br>
+ * Used to create slightly different behavior for agent and customer<br>
+ * It also leaves sending to inheriting class, which leads to more clear class taking care just about GUI
+ */
 public abstract class ChatWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 
@@ -42,6 +47,7 @@ public abstract class ChatWindow extends JFrame {
 	private JList<Message> chatList;
 	private ClientType clientType;
 
+	// voice components
 	private VoiceClient voiceClient;
 	private VoicePlayThread voicePlayThread;
 
@@ -55,12 +61,13 @@ public abstract class ChatWindow extends JFrame {
 	}
 
 	/**
-	 * Setup print writer for sending message from user to server
+	 * Setup print writer for sending messages from client to server
 	 */
 	protected abstract void setupWriter();
 
 	/**
-	 * This method invokes log out on both sides (customer, agent), called when user clicks button
+	 * This method invokes log out on both sides (customer, agent)<br>
+	 * Is called when user clicks button
 	 */
 	protected abstract void invokeLogOut();
 
@@ -113,7 +120,7 @@ public abstract class ChatWindow extends JFrame {
 
 		chatList = new JList<Message>(chatListModel);
 		chatList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		chatList.setVisibleRowCount(15); 
+		chatList.setVisibleRowCount(15);
 		DefaultListCellRenderer renderer = (DefaultListCellRenderer) chatList.getCellRenderer();
 		renderer.setHorizontalAlignment(SwingConstants.CENTER);
 		chatList.setCellRenderer(new ChatRenderer());
@@ -121,7 +128,7 @@ public abstract class ChatWindow extends JFrame {
 		chatList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				chatListClick(e.getPoint(), chatList);
+				chatListClick(e.getPoint());
 			}
 		});
 
@@ -130,7 +137,12 @@ public abstract class ChatWindow extends JFrame {
 		return chatListScroll;
 	}
 
-	private void chatListClick(Point point, JList<Message> chatList) {
+	/**
+	 * Handle click into chat list<br>
+	 * Invoke playing of voice message if one is clicked
+	 * @param point point with click location
+	 */
+	private void chatListClick(Point point) {
 		int index = chatList.locationToIndex(point);
 		Message item = (Message) chatList.getModel().getElementAt(index);
 		if (item.getMessageType() == MessageType.VOICE) {
@@ -143,6 +155,7 @@ public abstract class ChatWindow extends JFrame {
 	 * @return GUI component
 	 */
 	private Component getBottomInputPanel() {
+		// upper part
 		tfMainInput = new JTextField();
 		tfMainInput.addKeyListener(new MainInputKeyAdapter());
 
@@ -170,7 +183,7 @@ public abstract class ChatWindow extends JFrame {
 		messagingPanel.add(btPanel, BorderLayout.EAST);
 		messagingPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-
+		// lower part
 		BorderLayout voiceLayout = new BorderLayout(); 
 		voiceLayout.setHgap(5);
 		JPanel voicePanel = new JPanel(voiceLayout);
@@ -212,7 +225,7 @@ public abstract class ChatWindow extends JFrame {
 		
 		voicePanel.add(voiceLeftPanel, BorderLayout.WEST);
 
-
+		// panel for whole bottom controls
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
 		bottomPanel.add(messagingPanel);
@@ -222,7 +235,7 @@ public abstract class ChatWindow extends JFrame {
 	}
 
 	/**
-	 * Method for start of capturing
+	 * Method for starting of voice capture
 	 */
 	private void startCapture() {
 		btCapture.setEnabled(false);
@@ -233,7 +246,8 @@ public abstract class ChatWindow extends JFrame {
 	}
 
 	/**
-	 * Stop capturing, add message to window
+	 * Stop capturing<br>
+	 * Add message to window
 	 */
 	private byte[] stopCapture() {
 		btCapture.setEnabled(true);
@@ -243,6 +257,10 @@ public abstract class ChatWindow extends JFrame {
 		return voiceClient.stopCapture();
 	}
 
+	/**
+	 * Send voice to given customer<br>
+	 * Send flag to remove the data from the second one
+	 */
 	private void sendVoiceOne() {
 		byte[] voiceData = stopCapture();
 		addMessage(new Message(voiceData, ClientType.ME));
@@ -250,20 +268,23 @@ public abstract class ChatWindow extends JFrame {
 		ClientAgent.sendClear();
 	}
 
+	/**
+	 * Send voice to both customers
+	 */
 	private void sendVoiceBoth() {
 		byte[] voiceData = stopCapture();
 		ClientAgent.sendVoiceBoth(new Message(voiceData, ClientType.ME));
 	}
 
 	/**
-	 * In case voice message is being replayed right now, this function stops it
+	 * Stop playing in case a voice message is being replayed right now
 	 */
 	private void stopReplay() {
 		if (voicePlayThread != null) voicePlayThread.setStopPlaying(true);
 	}
 
 	/**
-	 * In case of agent, it is possible to send one message to both customers
+	 * In case of agent, it is possible to send one message to both customers<br>
 	 * Here it all starts
 	 */
 	private void showMessageBoth() {
@@ -304,7 +325,7 @@ public abstract class ChatWindow extends JFrame {
 	public void addMessage(Message message) {
 		chatListModel.getMessages().add(message);
 		chatListModel.update();
-		
+
 		// scroll down to see the newest message
 		chatList.setSelectedValue(message, true);
 	}

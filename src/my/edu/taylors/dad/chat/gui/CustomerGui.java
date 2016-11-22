@@ -14,6 +14,9 @@ import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.entity.Ports;
 
+/**
+ * Implements {@link ChatWindow} for customer
+ */
 public class CustomerGui extends ChatWindow {
 	private static final long serialVersionUID = 1L;
 

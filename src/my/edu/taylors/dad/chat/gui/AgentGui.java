@@ -20,6 +20,9 @@ import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.entity.Ports;
 import my.edu.taylors.dad.chat.saving.ISaver;
 
+/**
+ * Implements {@link ChatWindow} for agent
+ */
 public class AgentGui extends ChatWindow {
 	private static final long serialVersionUID = 1L;
 
@@ -27,8 +30,8 @@ public class AgentGui extends ChatWindow {
 	private Socket socket;
 	private PrintWriter writer;
 	private int clientId;
+
 	private ClientAgent clientAgent;
-	
 	private String customerName, agentName;
 
 	public AgentGui(ClientAgent clientAgent, Socket socket, String customerName, int clientId, String agentName,
@@ -59,6 +62,9 @@ public class AgentGui extends ChatWindow {
 		}
 	}
 
+	/**
+	 * Send flag to clear voice buffer on customers
+	 */
 	public void sendClear() {
 		if (!isLoggingOut()) {
 			writer.println(Flags.VOICE_CAPTURE_CLEAR);
@@ -92,6 +98,10 @@ public class AgentGui extends ChatWindow {
 		clientAgent.removeWindow(clientId);
 	}
 
+	/**
+	 * Agent initiates saving conversation once he or customer log out<br>
+	 * It is implemented through RMI registry which is running on the server
+	 */
 	private void saveConversation() {
 		try {
 			Registry registry = LocateRegistry.getRegistry(LoginMenu.serverIpAddress);
@@ -101,7 +111,6 @@ public class AgentGui extends ChatWindow {
 		} catch (RemoteException | NotBoundException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	public PrintWriter getWriter() {
