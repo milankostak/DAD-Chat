@@ -52,6 +52,14 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	public static void sendVoiceBoth(Message message) {
+		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
+			AgentGui gui = entry.getValue();
+			gui.addMessage(message);
+			gui.sendVoiceFinished();
+		}
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -134,4 +142,5 @@ public class ClientAgent extends Thread {
 		
 		waitingWindow.setVisible(false);
 	}
+
 }

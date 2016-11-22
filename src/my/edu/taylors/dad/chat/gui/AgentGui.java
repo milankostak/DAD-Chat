@@ -50,7 +50,7 @@ public class AgentGui extends ChatWindow {
 	}
 
 	@Override
-	protected void sendVoiceFinished() {
+	public void sendVoiceFinished() {
 		if (!isLoggingOut()) {
 			writer.println(Flags.VOICE_CAPTURE_FINISHED);
 			writer.println(clientId);

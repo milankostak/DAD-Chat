@@ -6,6 +6,8 @@ import javax.sound.sampled.AudioFormat;
  * For source see {@link VoiceServer}
  */
 public class VoiceUtils {
+	
+	public static final int PACKET_SIZE = 1000; 
 
 	private VoiceUtils() { }
 

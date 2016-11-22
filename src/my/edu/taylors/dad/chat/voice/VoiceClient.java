@@ -11,8 +11,6 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
-import my.edu.taylors.dad.chat.entity.Ports;
-
 /**
  * For source see {@link VoiceServer}
  */
@@ -21,6 +19,7 @@ public class VoiceClient {
 	private volatile boolean isCaptureRunning;
 	private volatile ByteArrayOutputStream byteOutputStream;
 	private TargetDataLine targetDataLine;
+
 	private final InetAddress inetAddress;
 	private final int serverPort;
 
@@ -29,7 +28,7 @@ public class VoiceClient {
 		this.isCaptureRunning = false;
 		this.serverPort = serverPort;
 	}
-	
+
 	public byte[] stopCapture() {
 		isCaptureRunning = false;
 		targetDataLine.close();
@@ -59,19 +58,19 @@ public class VoiceClient {
 		}
 
 		public void run() {
-			byte[] tempBuffer = new byte[500];
+			byte[] tempBuffer = new byte[VoiceUtils.PACKET_SIZE];
 
 			byteOutputStream = new ByteArrayOutputStream();
 			isCaptureRunning = true;
 
-			try (DatagramSocket clientSocket = new DatagramSocket(Ports.VOICE_CLIENT)) {
+			try (DatagramSocket clientSocket = new DatagramSocket()) {
 
 				while (isCaptureRunning) {
 					int count = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
 
 					if (count > 0) {
 						DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length,
-								InetAddress.getByName("192.168.137.255"), serverPort);
+								InetAddress.getByName("192.168.0.255"), serverPort);
 						clientSocket.send(sendPacket);
 						byteOutputStream.write(tempBuffer, 0, count);
 					}

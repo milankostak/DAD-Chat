@@ -38,11 +38,13 @@ public abstract class ChatWindow extends JFrame {
 	// GUI components
 	private JFrame mainFrame;
 	private JTextField tfMainInput;
-	private JButton btSendBoth, btSend, btLogOut, btCapture, btStop;
+	private JButton btSendBoth, btSend, btLogOut, btCapture, btStopSend, btStopSendBoth, btStopReplay;
 	private ChatListModel chatListModel;
 	private JScrollBar vertical;
 	private ClientType clientType;
+
 	private VoiceClient voiceClient;
+	private VoicePlayThread voicePlayThread;
 
 	private boolean isLoggingOut;
 
@@ -75,7 +77,10 @@ public abstract class ChatWindow extends JFrame {
 	 */
 	protected abstract void sendMessage(String message);
 
-
+	/**
+	 * Send to the other side message that voice capturing finished and it is possible to play it now<br>
+	 * (it is going to be displayed in GUI)
+	 */
 	protected abstract void sendVoiceFinished();
 
 	/**
@@ -131,7 +136,7 @@ public abstract class ChatWindow extends JFrame {
 		int index = chatList.locationToIndex(point);
 		Message item = (Message) chatList.getModel().getElementAt(index);
 		if (item.getMessageType() == MessageType.VOICE) {
-			new VoicePlayThread(item.getVoiceData());
+			voicePlayThread = new VoicePlayThread(item.getVoiceData());
 		}
 	}
 
@@ -155,7 +160,7 @@ public abstract class ChatWindow extends JFrame {
 
 		JPanel btPanel = new JPanel(new FlowLayout());
 		btPanel.add(btSend);
-		
+
 		if (clientType == ClientType.AGENT) {
 			btSendBoth = new JButton("Send both");
 			btSendBoth.setMnemonic(KeyEvent.VK_B);
@@ -185,12 +190,27 @@ public abstract class ChatWindow extends JFrame {
 		btCapture.addActionListener(e -> startCapture());
 		voiceLeftPanel.add(btCapture);
 
-		btStop = new JButton("Stop capturing");
-		btStop.setMnemonic(KeyEvent.VK_P);
-		btStop.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btStop.addActionListener(e -> stopCapture());
-		btStop.setEnabled(false);
-		voiceLeftPanel.add(btStop);
+		btStopSend = new JButton("Stop and send");
+		btStopSend.setMnemonic(KeyEvent.VK_P);
+		btStopSend.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btStopSend.addActionListener(e -> sendVoiceOne());
+		btStopSend.setEnabled(false);
+		voiceLeftPanel.add(btStopSend);
+
+		if (clientType == ClientType.AGENT) {
+			btStopSendBoth = new JButton("Stop and send both");
+			btStopSendBoth.setMnemonic(KeyEvent.VK_O);
+			btStopSendBoth.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			btStopSendBoth.addActionListener(e -> sendVoiceBoth());
+			btStopSendBoth.setEnabled(false);
+			voiceLeftPanel.add(btStopSendBoth);
+		}
+
+		btStopReplay = new JButton("Stop replay");
+		btStopReplay.setMnemonic(KeyEvent.VK_R);
+		btStopReplay.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btStopReplay.addActionListener(e -> stopReplay());
+		voiceLeftPanel.add(btStopReplay);
 		
 		voicePanel.add(voiceLeftPanel, BorderLayout.WEST);
 
@@ -208,7 +228,8 @@ public abstract class ChatWindow extends JFrame {
 	 */
 	private void startCapture() {
 		btCapture.setEnabled(false);
-		btStop.setEnabled(true);
+		btStopSend.setEnabled(true);
+		if (btStopSendBoth != null) btStopSendBoth.setEnabled(true);
 
 		voiceClient.captureAudio();
 	}
@@ -216,13 +237,30 @@ public abstract class ChatWindow extends JFrame {
 	/**
 	 * Stop capturing, add message to window
 	 */
-	private void stopCapture() {
+	private byte[] stopCapture() {
 		btCapture.setEnabled(true);
-		btStop.setEnabled(false);
+		btStopSend.setEnabled(false);
+		if (btStopSendBoth != null) btStopSendBoth.setEnabled(false);
 
-		byte[] voiceData = voiceClient.stopCapture();
+		return voiceClient.stopCapture();
+	}
+
+	private void sendVoiceOne() {
+		byte[] voiceData = stopCapture();
 		addMessage(new Message(voiceData, ClientType.ME));
 		sendVoiceFinished();
+	}
+
+	private void sendVoiceBoth() {
+		byte[] voiceData = stopCapture();
+		ClientAgent.sendVoiceBoth(new Message(voiceData, ClientType.ME));
+	}
+
+	/**
+	 * In case voice message is being replayed right now, this function stops it
+	 */
+	private void stopReplay() {
+		if (voicePlayThread != null) voicePlayThread.setStopPlaying(true);
 	}
 
 	/**
@@ -251,15 +289,15 @@ public abstract class ChatWindow extends JFrame {
 			return;
 		}
 		tfMainInput.setText("");
-		
+
 		Message newMessage = new Message(message, ClientType.ME);
-		
+
 		// show message
 		addMessage(newMessage);
-		
+
 		sendMessage(message);
 	}
-	
+
 	/**
 	 * Main method for adding new messages to chat window
 	 * @param message message to add
@@ -269,14 +307,17 @@ public abstract class ChatWindow extends JFrame {
 		chatListModel.update();
 		scrollDown();
 	}
-	
+
+	/**
+	 * Disable all GUI controls when user logs out 
+	 */
 	protected void disableControls() {
 		btSend.setEnabled(false);
 		btLogOut.setEnabled(false);
 		if (btSendBoth != null) btSendBoth.setEnabled(false);
 		tfMainInput.setEnabled(false);
 		btCapture.setEnabled(false);
-		btStop.setEnabled(false);
+		btStopSend.setEnabled(false);
 	}
 	
 	/**

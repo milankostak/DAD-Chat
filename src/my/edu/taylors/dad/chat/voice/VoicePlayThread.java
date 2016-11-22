@@ -18,27 +18,34 @@ public class VoicePlayThread extends Thread {
 
 	private AudioInputStream inputStream;
 	private SourceDataLine sourceLine;
+	private volatile boolean stopPlaying;
 
 	public VoicePlayThread(byte[] voiceArray) {
 		setVariables(voiceArray);
+		stopPlaying = false;
 		start();
 	}
 
+	@Override
 	public void run() {
-		byte tempBuffer[] = new byte[3000];
-		
+		byte tempBuffer[] = new byte[1000];
+
 		try {
-			int cnt;
-			while ((cnt = inputStream.read(tempBuffer, 0, tempBuffer.length)) != -1) {
-				if (cnt > 0) {
-					sourceLine.write(tempBuffer, 0, cnt);
+			int count;
+			while (!stopPlaying && (count = inputStream.read(tempBuffer, 0, tempBuffer.length)) != -1) {
+				if (count > 0) {
+					sourceLine.write(tempBuffer, 0, count);
 				}
 			}
 			// sourceLine.drain();
 			// sourceLine.close();
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
+	}
+
+	public void setStopPlaying(boolean stopPlaying) {
+		this.stopPlaying = stopPlaying;
 	}
 
 	public void setVariables(byte[] voiceArray) {

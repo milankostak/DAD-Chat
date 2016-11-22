@@ -18,7 +18,7 @@ import java.net.DatagramSocket;
  * 	<li>Code formatted in big matter to improve readability</li>
  * 	<li>Improved exception handling</li>
  * 	<li>Listeners with lambdas</li>
- * 	<li>VoiceServe extends a Thread now</li>
+ * 	<li>VoiceServer extends a Thread now</li>
  * 	<li>Completely removed GUI</li>
  * 	<li>Server now doesn't play immediately, but stores the sound for later play</li>
  * 	<li>Memory synchronization (volatile) </li>
@@ -45,7 +45,7 @@ public class VoiceServer extends Thread {
 	public void run() {
 		try (DatagramSocket serverSocket = new DatagramSocket(serverPort)) {
 
-			byte[] receiveData = new byte[500];
+			byte[] receiveData = new byte[VoiceUtils.PACKET_SIZE];
 
 			while (true) {
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
