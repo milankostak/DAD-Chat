@@ -58,7 +58,7 @@ public class ClientCustomer extends Thread {
 			
 			int agentWindowId = agent.getWindowId();
 			InetAddress customerAddress = customer.getInetAddress();
-			String multicastAddress = customer.getMulticastAddress();
+			String multicastAddress = agent.getMulticastAddress();
 
 			gui = new CustomerGui(socket, "Customer: " + customer.getUsername(), agentWindowId, customerAddress, multicastAddress);
 			gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));
