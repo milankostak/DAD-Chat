@@ -101,7 +101,7 @@ public class MessagingServer {
 						authenticatedUser.setPassword("");
 						failed = false;// stop AuthenticationHandler
 
-						if (authenticatedUser.getType() == 0) {
+						if (authenticatedUser.getClientType() == 0) {
 							pw.println(Flags.CUSTOMER_AUTHENTICATED);
 							authenticatedUser.setId(customerCount++);
 							ClientInfo clientInfo = new ClientInfo(authenticatedUser, client);

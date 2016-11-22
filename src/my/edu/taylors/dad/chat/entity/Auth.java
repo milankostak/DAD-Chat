@@ -7,30 +7,30 @@ public class Auth implements Serializable {
 
 	private String username;
 	private String password;
-	private int type;
+	private int clientType;
 	private int id;
 	
 	public Auth(String username, String password) {
 		this(username, password, 0);
 	}
 
-	public Auth(String username, String password, int type) {
-		this(username, password, type, 0);
+	public Auth(String username, String password, int clientType) {
+		this(username, password, clientType, 0);
 	}
 
-	public Auth(String username, String password, int type, int id) {
+	public Auth(String username, String password, int clientType, int id) {
 		this.username = username;
 		this.password = password;
-		this.type = type;
+		this.clientType = clientType;
 		this.id = id;
 	}
-	
-	public int getType() {
-		return type;
+
+	public int getClientType() {
+		return clientType;
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public void setClientType(int clientType) {
+		this.clientType = clientType;
 	}
 
 	public String getUsername() {
@@ -80,7 +80,7 @@ public class Auth implements Serializable {
 			if (found == null) {
 				if (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password)) {
 					// because of reference to password
-					found = new Auth(user.username, user.password, user.type);
+					found = new Auth(user.username, user.password, user.clientType);
 					break;
 				}
 			}
@@ -90,7 +90,7 @@ public class Auth implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Auth [username=" + username + ", password=" + password + ", type=" + type + ", id=" + id + "]";
+		return "Auth [username=" + username + ", password=" + password + ", clientType=" + clientType + ", id=" + id + "]";
 	}
 
 }

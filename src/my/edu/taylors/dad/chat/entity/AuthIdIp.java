@@ -10,7 +10,7 @@ public class AuthIdIp extends Auth implements Serializable {
 	private InetAddress inetAddress;
 
 	public AuthIdIp(Auth auth, int windowId, InetAddress inetAddress) {
-		super(auth.getUsername(), auth.getPassword(), auth.getType(), auth.getId());
+		super(auth.getUsername(), auth.getPassword(), auth.getClientType(), auth.getId());
 		this.windowId = windowId;
 		this.inetAddress = inetAddress;
 	}
@@ -33,8 +33,8 @@ public class AuthIdIp extends Auth implements Serializable {
 
 	@Override
 	public String toString() {
-		return "AuthIdIp [windowId=" + windowId + ", inetAddress=" + inetAddress + ", getType()=" + getType()
-				+ ", getUsername()=" + getUsername() + ", getPassword()=" + getPassword() + ", getId()=" + getId()
+		return "AuthIdIp [windowId=" + windowId + ", inetAddress=" + inetAddress + ", clientType=" + getClientType()
+				+ ", username=" + getUsername() + ", password=" + getPassword() + ", id=" + getId()
 				+ "]";
 	}
 
