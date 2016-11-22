@@ -21,10 +21,14 @@ public class VoiceClient {
 	private TargetDataLine targetDataLine;
 
 	private final int serverPort;
+	private final InetAddress interfaceAddress;
+	private final String multicastAddress;
 
-	public VoiceClient(InetAddress inetAddress, int serverPort) {
+	public VoiceClient(int serverPort, InetAddress interfaceAddress, String multicastAddress) {
 		this.isCaptureRunning = false;
 		this.serverPort = serverPort;
+		this.interfaceAddress = interfaceAddress;
+		this.multicastAddress = multicastAddress;
 	}
 
 	public byte[] stopCapture() {
@@ -63,8 +67,8 @@ public class VoiceClient {
 
 			try (MulticastSocket multicastSocket = new MulticastSocket();) {
 
-				multicastSocket.setInterface(InetAddress.getByName("192.168.137.207"));
-				InetAddress multicastgroupAddress = InetAddress.getByName("235.1.1.1");
+				multicastSocket.setInterface(interfaceAddress);
+				InetAddress multicastgroupAddress = InetAddress.getByName(multicastAddress);
 				
 				while (isCaptureRunning) {
 					int count = targetDataLine.read(tempBuffer, 0, tempBuffer.length);

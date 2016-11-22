@@ -29,11 +29,16 @@ public class VoiceServer extends Thread {
 
 	private volatile ByteArrayOutputStream byteOutputStream;
 	private volatile boolean cleared;
-	private final int serverPort;
 
-	public VoiceServer(int serverPort) {
+	private final int serverPort;
+	private final InetAddress interfaceAddress;
+	private final String multicastAddress;
+
+	public VoiceServer(int serverPort, InetAddress interfaceAddress, String multicastAddress) {
 		this.cleared = true;
 		this.serverPort = serverPort;
+		this.interfaceAddress = interfaceAddress;
+		this.multicastAddress = multicastAddress;
 		start();
 	}
 
@@ -46,8 +51,8 @@ public class VoiceServer extends Thread {
 	public void run() {
 		try (MulticastSocket serverSocket = new MulticastSocket(serverPort)) {
 
-			InetAddress multicastgroupAddress = InetAddress.getByName("235.1.1.1");
-			serverSocket.setInterface(InetAddress.getByName("192.168.137.207"));
+			InetAddress multicastgroupAddress = InetAddress.getByName(multicastAddress);
+			serverSocket.setInterface(interfaceAddress);
 			serverSocket.joinGroup(multicastgroupAddress);
 
 			byte[] receiveData = new byte[VoiceUtils.PACKET_SIZE];

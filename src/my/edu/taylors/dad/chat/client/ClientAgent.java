@@ -6,14 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
 
-import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.Agent;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Customer;
 import my.edu.taylors.dad.chat.entity.Flags;
@@ -27,21 +26,21 @@ public class ClientAgent extends Thread {
 
 	private JFrame waitingWindow;
 	private Socket socket;
-	private Auth agent;
+	private Agent agent;
 	private VoiceServer voiceServer;
-	
+
 	public static Map<Integer, AgentGui> windows = new HashMap<>(2);
 
-	public ClientAgent(Socket socket, Auth agent) {
+	public ClientAgent(Socket socket, Agent agent) {
 		this.socket = socket;
 		this.agent = agent;
 		setupWaitingGui();
-		voiceServer = new VoiceServer(Ports.VOICE_SERVER_AGENT);
+		voiceServer = new VoiceServer(Ports.VOICE_SERVER_AGENT, agent.getInetAddress(), agent.getMulticastAddress());
 		start();
 	}
 
 	private void setupWaitingGui() {		
-		waitingWindow = new WaitingWindow(" Please wait for a client to connect.");
+		waitingWindow = new WaitingWindow(" Please wait for a customer to connect.");
 		waitingWindow.setVisible(true);
 	}
 
@@ -133,9 +132,9 @@ public class ClientAgent extends Thread {
 
 		int clientId = customer.getId();
 		int windowId = customer.getWindowId();
-		InetAddress customerIp = customer.getInetAddress();
 
-		AgentGui gui = new AgentGui(this, socket, customer.getUsername(), clientId, agent.getUsername(), customerIp);
+		AgentGui gui = new AgentGui(this, socket, customer.getUsername(), clientId, agent.getUsername(),
+				agent.getInetAddress(), agent.getMulticastAddress());
 		windows.put(windowId, gui);
 
 		gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));

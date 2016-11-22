@@ -52,6 +52,7 @@ public class ServerAgent extends Thread {
 				boolean keepRunning = true;
 				while (keepRunning) {
 					String clientId = brFromAgent.readLine();
+					if (clientId == null) continue;
 
 					if (clientId.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
 						// new customer connected to agent

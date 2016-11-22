@@ -31,8 +31,10 @@ public class AgentGui extends ChatWindow {
 	
 	private String customerName, agentName;
 
-	public AgentGui(ClientAgent clientAgent, Socket socket, String customerName, int clientId, String agentName, InetAddress IP) {
-		super("Agent: conversation with customer " + customerName, ClientType.AGENT, IP, Ports.VOICE_SERVER_CUSTOMER);
+	public AgentGui(ClientAgent clientAgent, Socket socket, String customerName, int clientId, String agentName,
+			InetAddress agentAddress, String multicastAddress) {
+		super("Agent: conversation with customer " + customerName, ClientType.AGENT, Ports.VOICE_SERVER_CUSTOMER,
+				agentAddress, multicastAddress);
 		this.clientAgent = clientAgent;
 		this.socket = socket;
 		this.customerName = customerName;

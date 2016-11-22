@@ -1,7 +1,7 @@
 package my.edu.taylors.dad.chat.server;
 
 import java.io.ObjectInputStream;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,6 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import my.edu.taylors.dad.chat.entity.Agent;
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.AuthResult;
 import my.edu.taylors.dad.chat.entity.CustomerInfo;
 import my.edu.taylors.dad.chat.entity.ClientType;
 import my.edu.taylors.dad.chat.entity.Customer;
@@ -17,15 +18,16 @@ import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Ports;
 
 public class MessagingServer {
-	static Auth[] users = {
-			new Auth("omar", "123", ClientType.CUSTOMER),
-			new Auth("test", "123", ClientType.CUSTOMER),
-			new Auth("test2", "123", ClientType.CUSTOMER),
-			new Auth("test3", "123", ClientType.CUSTOMER),
-			new Auth("admin", "root", ClientType.AGENT),
-			new Auth("admin2", "root", ClientType.AGENT),
-			new Auth("admin3", "root", ClientType.AGENT),
-			new Auth("agent", "root", ClientType.AGENT)
+	private static Auth[] users = {
+			new Customer("test", "123"),
+			new Customer("test2", "123"),
+			new Customer("test3", "123"),
+			new Customer("test4", "123"),
+			// 224.0.0.0 - 239.255.255.255
+			new Agent("admin", "root", "231.1.1.1"),
+			new Agent("admin2", "root", "231.1.1.2"),
+			new Agent("admin3", "root", "231.1.1.3"),
+			new Agent("admin4", "root", "231.1.1.4")
 	};
 
 	static ArrayBlockingQueue<CustomerInfo> connectionQueue;
@@ -79,11 +81,12 @@ public class MessagingServer {
 			try {
 				boolean failed = true;
 				while (failed) {
-					PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
+					//PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
 
 					ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 					Auth receivedUser = (Auth) ois.readObject();
 					Auth authenticatedUser = null;
+					ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
 
 					// check attempts
 					attemptsNumber++;
@@ -97,27 +100,38 @@ public class MessagingServer {
 					// too many attempts
 					if (attemptsNumber > MAX_ATTEMPTS) {
 
-						pw.println(Flags.AUTHENTICATICATION_ATTEMTPS);
-					
+						AuthResult result = new AuthResult(null, Flags.AUTHENTICATICATION_ATTEMTPS);
+						oos.writeObject(result);
+
 					// check if the user matches any of our current users (Authentication)
 					} else if (attemptsNumber <= MAX_ATTEMPTS && (authenticatedUser = receivedUser.authenticate(users)) != null) {
 						authenticatedUser.setPassword("");
 						failed = false;// stop AuthenticationHandler
-						
+
 						if (authenticatedUser.getClientType() == ClientType.CUSTOMER) {
-							pw.println(Flags.CUSTOMER_AUTHENTICATED);
 							Customer customer = (Customer) authenticatedUser; 
+							customer.setInetAddress(client.getInetAddress());
 							customer.setId(customerCount++);
+
+							AuthResult result = new AuthResult(customer, Flags.CUSTOMER_AUTHENTICATED);
+							oos.writeObject(result);
+
 							CustomerInfo customerInfo = new CustomerInfo(customer, client);
 							connectionQueue.put(customerInfo);
 						} else {
-							pw.println(Flags.AGENT_AUTHENTICATED);
-							new ServerAgent(client, (Agent) authenticatedUser);
+							Agent agent = (Agent) authenticatedUser;
+							agent.setInetAddress(client.getInetAddress());
+
+							AuthResult result = new AuthResult(agent, Flags.AGENT_AUTHENTICATED);
+							oos.writeObject(result);
+
+							new ServerAgent(client, agent);
 						}
 
 					// Wrong combination
 					} else {
-						pw.println(Flags.AUTHENTICATICATION_ERROR);
+						AuthResult result = new AuthResult(null, Flags.AUTHENTICATICATION_ERROR);
+						oos.writeObject(result);
 					}
 				}
 			} catch (Exception e) {

@@ -22,8 +22,9 @@ public class CustomerGui extends ChatWindow {
 	private PrintWriter writer;
 	private int otherSideId;
 
-	public CustomerGui(Socket socket, String title, int otherSideId, InetAddress IP) {
-		super(title, ClientType.CUSTOMER, IP, Ports.VOICE_SERVER_AGENT);
+	public CustomerGui(Socket socket, String title, int otherSideId,
+			InetAddress customerAddress, String multicastAddress) {
+		super(title, ClientType.CUSTOMER, Ports.VOICE_SERVER_AGENT, customerAddress, multicastAddress);
 		this.socket = socket;
 		this.otherSideId = otherSideId;
 		setupWriter();

@@ -10,8 +10,8 @@ import java.net.Socket;
 import javax.swing.JFrame;
 
 import my.edu.taylors.dad.chat.entity.Agent;
-import my.edu.taylors.dad.chat.entity.Auth;
 import my.edu.taylors.dad.chat.entity.ClientType;
+import my.edu.taylors.dad.chat.entity.Customer;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Message;
 import my.edu.taylors.dad.chat.entity.Ports;
@@ -23,16 +23,15 @@ public class ClientCustomer extends Thread {
 
 	private JFrame waitingWindow;
 	private Socket socket;
-	private Auth authCustomer;
+	private Customer customer;
 	private VoiceServer voiceServer;
 
 	private CustomerGui gui;
 
-	public ClientCustomer(Socket socket, Auth authCustomer) {
+	public ClientCustomer(Socket socket, Customer customer) {
 		this.socket = socket;
-		this.authCustomer = authCustomer;
+		this.customer = customer;
 		setupWaitingGui();
-		voiceServer = new VoiceServer(Ports.VOICE_SERVER_CUSTOMER);
 		start();
 	}
 
@@ -46,12 +45,18 @@ public class ClientCustomer extends Thread {
 		try {// TODO StreamCorruptedException
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 			Agent agent = (Agent) ois.readObject();
+			customer.setAgent(agent);
 			System.out.println("Customer received agent: " + agent.toString());
-			int agentWindowId = agent.getWindowId();
-			InetAddress agentIp = agent.getInetAddress();
+
+			voiceServer = new VoiceServer(Ports.VOICE_SERVER_CUSTOMER, customer.getInetAddress(), agent.getMulticastAddress());
 
 			waitingWindow.setVisible(false);
-			gui = new CustomerGui(socket, "Customer: " + authCustomer.getUsername(), agentWindowId, agentIp);
+			
+			int agentWindowId = agent.getWindowId();
+			InetAddress customerAddress = customer.getInetAddress();
+			String multicastAddress = customer.getMulticastAddress();
+			
+			gui = new CustomerGui(socket, "Customer: " + customer.getUsername(), agentWindowId, customerAddress, multicastAddress);
 			gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();

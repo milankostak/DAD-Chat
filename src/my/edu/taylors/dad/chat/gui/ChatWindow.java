@@ -48,11 +48,11 @@ public abstract class ChatWindow extends JFrame {
 
 	private boolean isLoggingOut;
 
-	public ChatWindow(String title, ClientType clientType, InetAddress IP, int port) {
+	public ChatWindow(String title, ClientType clientType, int port, InetAddress interfaceAddress, String multicastAddress) {
 		this.clientType = clientType;
 		this.isLoggingOut = false;
 		setUpGui(title);
-		voiceClient = new VoiceClient(IP, port);
+		voiceClient = new VoiceClient(port, interfaceAddress, multicastAddress);
 	}
 
 	/**

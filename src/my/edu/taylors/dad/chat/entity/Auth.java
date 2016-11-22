@@ -12,6 +12,7 @@ public class Auth implements Serializable {
 	private int id;
 	private int windowId;
 	private InetAddress inetAddress;
+	private String multicastAddress;
 
 	public Auth(String username, String password) {
 		this.username = username;
@@ -24,15 +25,22 @@ public class Auth implements Serializable {
 		this.clientType = clientType;
 	}
 
-	public Auth(String username, String password, ClientType clientType, int id, int windowId,
-			InetAddress inetAddress) {
-		super();
+	public Auth(String username, String password, ClientType clientType, String multicastAddress) {
+		this.username = username;
+		this.password = password;
+		this.clientType = clientType;
+		this.multicastAddress = multicastAddress;
+	}
+
+	public Auth(String username, String password, ClientType clientType, int id, int windowId, InetAddress inetAddress,
+			String multicastAddress) {
 		this.username = username;
 		this.password = password;
 		this.clientType = clientType;
 		this.id = id;
 		this.windowId = windowId;
 		this.inetAddress = inetAddress;
+		this.multicastAddress = multicastAddress;
 	}
 
 	public InetAddress getInetAddress() {
@@ -83,6 +91,14 @@ public class Auth implements Serializable {
 		this.windowId = windowId;
 	}
 
+	public String getMulticastAddress() {
+		return multicastAddress;
+	}
+
+	public void setMulticastAddress(String multicastAddress) {
+		this.multicastAddress = multicastAddress;
+	}
+
 	public boolean equals(Auth user) {
 		return (user.username.toLowerCase().equals(username.toLowerCase()) && user.password.equals(password));
 	}
@@ -109,7 +125,7 @@ public class Auth implements Serializable {
 					if (user.clientType == ClientType.CUSTOMER) {
 						found = new Customer(user.username, user.password);
 					} else {
-						found = new Agent(user.username, user.password);
+						found = new Agent(user.username, user.password, user.multicastAddress);
 					}
 					break;
 				}

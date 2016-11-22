@@ -7,9 +7,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
@@ -22,7 +21,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import my.edu.taylors.dad.chat.entity.Agent;
 import my.edu.taylors.dad.chat.entity.Auth;
+import my.edu.taylors.dad.chat.entity.AuthResult;
+import my.edu.taylors.dad.chat.entity.Customer;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Ports;
 import my.edu.taylors.dad.chat.gsa.GsaClient;
@@ -121,20 +123,24 @@ public class LoginMenu extends JFrame {
 			output.writeObject(auth);
 
 			// read the result message from server
-			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			//BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			ObjectInputStream ois2 = new ObjectInputStream(socket.getInputStream());
+			AuthResult result = (AuthResult) ois2.readObject();
 			
-			int type = Integer.parseInt(fromServer.readLine());
+			int type = Integer.parseInt(result.getResult());
 			switch (type) {
 				// Guest
 				case Flags.CUSTOMER_AUTHENTICATED_I:
-					new ClientCustomer(socket, auth);
+					Customer customer = (Customer) result.getAuth();
+					new ClientCustomer(socket, customer);
 					this.setVisible(false);
 					this.dispose();
 					break;
 
 				// Agent
 				case Flags.AGENT_AUTHENTICATED_I:
-					new ClientAgent(socket, auth);
+					Agent agent = (Agent) result.getAuth();
+					new ClientAgent(socket, agent);
 					this.setVisible(false);
 					this.dispose();
 					break;
@@ -150,7 +156,7 @@ public class LoginMenu extends JFrame {
 					break;
 			}
 
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			if (socket != null) {
 				try {
