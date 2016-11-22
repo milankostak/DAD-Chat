@@ -22,6 +22,10 @@ import my.edu.taylors.dad.chat.gui.AgentGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
 import my.edu.taylors.dad.chat.voice.VoiceServer;
 
+/**
+ * Class of agent client<br>
+ * Its thread handles customer to agent communication (it receives)
+ */
 public class ClientAgent extends Thread {
 
 	private JFrame waitingWindow;
@@ -29,6 +33,7 @@ public class ClientAgent extends Thread {
 	private Agent agent;
 	private VoiceServer voiceServer;
 
+	// holds references to both agent's windows
 	public static Map<Integer, AgentGui> windows = new HashMap<>(2);
 
 	public ClientAgent(Socket socket, Agent agent) {
@@ -39,11 +44,15 @@ public class ClientAgent extends Thread {
 		start();
 	}
 
-	private void setupWaitingGui() {		
+	private void setupWaitingGui() {
 		waitingWindow = new WaitingWindow(" Please wait for a customer to connect.");
 		waitingWindow.setVisible(true);
 	}
 
+	/**
+	 * Sends text message to both customers
+	 * @param message text of message
+	 */
 	public static void sendBoth(String message) {
 		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
 			AgentGui gui = entry.getValue();
@@ -51,6 +60,10 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	/**
+	 * Sends voice message to both customers
+	 * @param message {@link Message}
+	 */
 	public static void sendVoiceBoth(Message message) {
 		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
 			AgentGui gui = entry.getValue();
@@ -59,6 +72,9 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	/**
+	 * Send clear command to customers to clear their buffers so there is no overlap
+	 */
 	public static void sendClear() {
 		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
 			AgentGui gui = entry.getValue();
@@ -75,6 +91,7 @@ public class ClientAgent extends Thread {
 			while (keepReceiving) {
 				String message = fromServer.readLine();
 
+				// if received this flag, next data coming is new customer
 				if (message.equals(Flags.SENDING_CUSTOMER_TO_AGENT)) {
 					getNewCustomer();
 
@@ -86,6 +103,7 @@ public class ClientAgent extends Thread {
 					agentGui.getWriter().println(customerId);
 					prepareLogOut(customerId);
 
+				// customer finished voice capture, pick up buffer and show message
 				} else if (message.equals(Flags.VOICE_CAPTURE_FINISHED)) {
 					String customerId = fromServer.readLine();
 					AgentGui agentGui = windows.get(Integer.parseInt(customerId));
@@ -97,7 +115,8 @@ public class ClientAgent extends Thread {
 
 				} else if (message.equals(Flags.VOICE_CAPTURE_CLEAR)) {
 					voiceServer.getByteOutputStream();
-					
+
+				// otherwise receive normal text message
  				} else {
  					int customerId = Integer.parseInt(message);
 					String messageFromAgent = fromServer.readLine();
@@ -113,6 +132,10 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	/**
+	 * Customer logged out, perform necessary actions
+	 * @param customerId string with customer id
+	 */
 	private void prepareLogOut(String customerId) {
 		int customerIdInt = Integer.parseInt(customerId);
 		AgentGui agentGui = windows.get(customerIdInt);
@@ -124,6 +147,11 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	/**
+	 * After log out is complete, remove window from HashMap<br>
+	 * If it is empty then, show waiting dialog
+	 * @param customerIdInt number with customer id
+	 */
 	public void removeWindow(int customerIdInt) {
 		windows.remove(customerIdInt);
 		if (windows.size() == 0) {
@@ -131,11 +159,17 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	/**
+	 * When received flag for receiving new customer, this is the method that handles it<br>
+	 * After that it creates a new window for communication with that customer
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private void getNewCustomer() throws IOException, ClassNotFoundException {
 
 		PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
 		writer.println(Flags.SENDING_CUSTOMER_TO_AGENT);
-		
+
 		ObjectInputStream ios = new ObjectInputStream(socket.getInputStream());
 		Customer customer = (Customer) ios.readObject();
 		System.out.println("Agent received customer: " + customer.toString());
@@ -148,7 +182,7 @@ public class ClientAgent extends Thread {
 		windows.put(windowId, gui);
 
 		gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.ME));
-		
+
 		waitingWindow.setVisible(false);
 	}
 

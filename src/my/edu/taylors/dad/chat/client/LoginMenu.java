@@ -29,6 +29,11 @@ import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Ports;
 import my.edu.taylors.dad.chat.gsa.GsaClient;
 
+/**
+ * Running class for clients<br>
+ * Obtains server IP address and handles authentication<br>
+ * Then creates either {@link ClientAgent} or {@link ClientCustomer}
+ */
 public class LoginMenu extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -104,6 +109,10 @@ public class LoginMenu extends JFrame {
 		return bottomPanel;
 	}
 
+	/**
+	 * Reads inputs a returns {@link Auth} object
+	 * @return
+	 */
 	private Auth getAuth() {
 		String username = tfUsername.getText();
 		char[] passwordChars = tfPassword.getPassword();
@@ -113,6 +122,9 @@ public class LoginMenu extends JFrame {
 		return auth;
 	}
 
+	/**
+	 * Sends credentials to server and waits for response
+	 */
 	private void authenticate() {
 		Auth auth = getAuth();
 		try {
@@ -122,11 +134,10 @@ public class LoginMenu extends JFrame {
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 			output.writeObject(auth);
 
-			// read the result message from server
-			//BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			// read the result object from server
 			ObjectInputStream ois2 = new ObjectInputStream(socket.getInputStream());
 			AuthResult result = (AuthResult) ois2.readObject();
-			
+
 			int type = Integer.parseInt(result.getResult());
 			switch (type) {
 				// Guest
@@ -150,8 +161,8 @@ public class LoginMenu extends JFrame {
 					JOptionPane.showOptionDialog(null, "You made too many attempts. Try again later.", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
 					break;
 
+				// Wrong combination or error
 				default:
-					// Wrong combination or error
 					JOptionPane.showOptionDialog(null, "Wrong combination", "Sorry", JOptionPane.WARNING_MESSAGE, NORMAL, null, null, null);
 					break;
 			}

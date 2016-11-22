@@ -19,6 +19,10 @@ import my.edu.taylors.dad.chat.gui.CustomerGui;
 import my.edu.taylors.dad.chat.gui.WaitingWindow;
 import my.edu.taylors.dad.chat.voice.VoiceServer;
 
+/**
+ * Class of customer client<br>
+ * Its thread handles agent to customer communication (it receives)
+ */
 public class ClientCustomer extends Thread {
 
 	private JFrame waitingWindow;
@@ -42,7 +46,8 @@ public class ClientCustomer extends Thread {
 
 	@Override
 	public void run() {
-		try {// TODO StreamCorruptedException
+		// firstly get agent information and show window...
+		try {
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 			Agent agent = (Agent) ois.readObject();
 			customer.setAgent(agent);
@@ -55,14 +60,15 @@ public class ClientCustomer extends Thread {
 			int agentWindowId = agent.getWindowId();
 			InetAddress customerAddress = customer.getInetAddress();
 			String multicastAddress = customer.getMulticastAddress();
-			
+
 			gui = new CustomerGui(socket, "Customer: " + customer.getUsername(), agentWindowId, customerAddress, multicastAddress);
 			gui.addMessage(new Message("Hello, I am " + agent.getUsername() + ". How can I help you?", ClientType.NOT_ME));
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-		// receive from agent
+
+		// ... then keep receiving messages from agent
+		// agent to customer way
 		try {
 			BufferedReader fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			while (!gui.isLoggingOut()) {
@@ -76,29 +82,32 @@ public class ClientCustomer extends Thread {
 						gui.getWriter().close();
 						fromServer.close();
 						gui.logOut(new Message("Agent ended the conversation", ClientType.NOT_ME));
-					
+
 					// customer logged out, this is confirmation
 					} else if (flag.equals(Flags.CUSTOMER_LOGGING_OUT)) {
 						gui.getWriter().close();
 						fromServer.close();
 						gui.logOut(new Message("Customer ended the conversation", ClientType.ME));
 
+					// agent finished voice capture, pick up buffer and show message
 					} else if (flag.equals(Flags.VOICE_CAPTURE_FINISHED)) {
 						byte[] voiceData = voiceServer.getByteOutputStream();
 						Message msg = new Message(voiceData, ClientType.NOT_ME);
 						gui.addMessage(msg);
 
+					// clean buffer if case received data were for second customer
 					} else if (flag.equals(Flags.VOICE_CAPTURE_CLEAR)) {
 						voiceServer.getByteOutputStream();
-						
+
 					} else {
 						String message = fromServer.readLine();
 						Message msg = new Message(message, ClientType.NOT_ME);
 						gui.addMessage(msg);
 					}
 
-				}
-			}
+				} // if (flag != null)
+
+			} // while (!gui.isLoggingOut())
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
