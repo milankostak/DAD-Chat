@@ -21,12 +21,14 @@ public class ServerAgent extends Thread {
 
 	private Map<Integer, Socket> customersMap = new HashMap<>(2);
 	private Auth agent;
+	public volatile boolean isAgentConnected;
 	private static int windowCount = 0;
 
 	private ArrayBlockingQueue<AuthIdIp> queue = new ArrayBlockingQueue<>(1);
 
 	public ServerAgent(Socket agentSocket, Auth agent) {
 		this.agent = agent;
+		this.isAgentConnected = true;
 
 		for (int i = 0; i < 2; i++) {
 			new CustomerToAgentHandler(agentSocket, i);
@@ -97,6 +99,7 @@ public class ServerAgent extends Thread {
 					}
 				}
 			} catch (SocketException e) {
+				isAgentConnected = false;
 				System.err.println("Agent disconnected");
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
@@ -127,9 +130,16 @@ public class ServerAgent extends Thread {
 		public void run() {
 			try {
 				try {
-					while (true) {
-						tempWindowId = windowCount++;
+					while (isAgentConnected) {
 						clientInfo = MessagingServer.connectionQueue.take();
+						
+						// when agent disconnects unexpectedly, this two thread keep running
+						// stop them and re-put clients into queue
+						if (!isAgentConnected) {
+							MessagingServer.connectionQueue.put(clientInfo);
+							break;
+						}
+						tempWindowId = windowCount++;
 						client = clientInfo.getSocket();
 						customersMap.put(clientInfo.getAuth().getId(), client);
 
