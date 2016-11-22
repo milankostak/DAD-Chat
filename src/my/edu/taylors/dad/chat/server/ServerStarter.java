@@ -3,6 +3,9 @@ package my.edu.taylors.dad.chat.server;
 import my.edu.taylors.dad.chat.gsa.GsaServer;
 import my.edu.taylors.dad.chat.saving.RmiServer;
 
+/**
+ * Separated all server started into this class
+ */
 public class ServerStarter {
 
 	public static void main(String[] args) {

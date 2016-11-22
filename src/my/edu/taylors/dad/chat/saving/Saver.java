@@ -24,7 +24,7 @@ public class Saver extends UnicastRemoteObject implements ISaver {
 
 		long timestamp = new Date().getTime();
 		File file = new File("logs/" + timestamp + ".txt");
-		file.getParentFile().mkdirs();
+		file.getParentFile().mkdirs();// make a log folder if it doesn't exist
 
 		try (PrintWriter writer = new PrintWriter(file)) {
 			writer.println("Created on " + new Date());

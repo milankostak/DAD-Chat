@@ -17,6 +17,10 @@ import my.edu.taylors.dad.chat.entity.Customer;
 import my.edu.taylors.dad.chat.entity.CustomerInfo;
 import my.edu.taylors.dad.chat.entity.Flags;
 
+/**
+ * After successful authentication, this is run for every agent.<br>
+ * Redirects messages from agent to customer and from customer to agent
+ */
 public class ServerAgent extends Thread {
 
 	private Map<Integer, Socket> customersMap = new HashMap<>(2);
@@ -80,7 +84,8 @@ public class ServerAgent extends Thread {
 						client.close();
 						customersMap.remove(clientIdString);
 
-					// when TODO
+					// when agent finishes voice capture, it is sending confirmation to customer to take the received message
+					// other option is saying other customer to clear the buffer so it doesn't overlap with another messages
 					} else if (clientId.equals(Flags.VOICE_CAPTURE_FINISHED) || clientId.equals(Flags.VOICE_CAPTURE_CLEAR)) {
 						String clientIdString = brFromAgent.readLine();
 						int clientIdInt = Integer.parseInt(clientIdString);
@@ -88,6 +93,7 @@ public class ServerAgent extends Thread {
 						PrintWriter pwToCustomer = new PrintWriter(client.getOutputStream(), true);
 						pwToCustomer.println(clientId);
 
+					// otherwise redirect normal message
 					} else {
 						String receivedMsg = brFromAgent.readLine();
 
@@ -134,7 +140,7 @@ public class ServerAgent extends Thread {
 					while (isAgentConnected) {
 						customerInfo = MessagingServer.connectionQueue.take();
 						
-						// when agent disconnects unexpectedly, this two thread keep running
+						// when agent disconnects unexpectedly, this two threads keep running
 						// stop them and re-put clients into queue
 						if (!isAgentConnected) {
 							MessagingServer.connectionQueue.put(customerInfo);
@@ -149,12 +155,13 @@ public class ServerAgent extends Thread {
 						Agent agentWId = new Agent(agent, tempWindowId, agentSocket.getInetAddress());
 						outputToCustomer.writeObject(agentWId);
 
+						// initiate sending customer to agent
 						BufferedReader brFromCustomer = new BufferedReader(new InputStreamReader(client.getInputStream()));
 						PrintWriter pwToAgent = new PrintWriter(new OutputStreamWriter(agentSocket.getOutputStream()), true);
 						pwToAgent.println(Flags.SENDING_CUSTOMER_TO_AGENT);
 						queue.put(new Customer(customerInfo.getCustomer(), tempWindowId, client.getInetAddress()));
 
-						// customer to agent
+						// customer to agent communication
 						boolean keepReceiving = true;
 						while (keepReceiving) {
 							String receivedId = brFromCustomer.readLine();
@@ -173,21 +180,23 @@ public class ServerAgent extends Thread {
 									// no need to send back to agent, because he still listens to other customers
 									client.close();
 
-								// when TODO
+								// when customer finishes voice capture
+								// it is sending confirmation to agent to take the received message
 								} else if (receivedId.equals(Flags.VOICE_CAPTURE_FINISHED)) {
 									String receivedId2 = brFromCustomer.readLine();
-									pwToAgent.println(receivedId);
+									pwToAgent.println(Flags.VOICE_CAPTURE_FINISHED);
 									pwToAgent.println(receivedId2);
-									
+
+								// otherwise just redirect normal message
 								} else {
 									String receivedMsg = brFromCustomer.readLine();
 									pwToAgent.println(receivedId);
 									pwToAgent.println(receivedMsg);
 								}
 
-							}
-						}
-					}// while (true)
+							}// if (receivedId != null)
+						}// while (keepReceiving)
+					}// while (isAgentConnected)
 				} finally {
 					if (client != null) client.close();
 				}
@@ -195,5 +204,7 @@ public class ServerAgent extends Thread {
 				e.printStackTrace();
 			} 
 		}
+
 	}
+
 }

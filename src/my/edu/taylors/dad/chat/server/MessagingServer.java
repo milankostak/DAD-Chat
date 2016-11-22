@@ -17,7 +17,11 @@ import my.edu.taylors.dad.chat.entity.Customer;
 import my.edu.taylors.dad.chat.entity.Flags;
 import my.edu.taylors.dad.chat.entity.Ports;
 
+/**
+ * Main server for messaging
+ */
 public class MessagingServer {
+
 	private static Auth[] users = {
 			new Customer("test", "123"),
 			new Customer("test2", "123"),
@@ -33,24 +37,20 @@ public class MessagingServer {
 	static ArrayBlockingQueue<CustomerInfo> connectionQueue;
 
 	// for ID purpose
-	private int customerCount = 0;
+	private int customerCount;
 
 	public MessagingServer() {
 		customerCount = 0;
 		connectionQueue = new ArrayBlockingQueue<CustomerInfo>(5);
-		ServerSocket server = null;
-		try {
-			try {
-				server = new ServerSocket(Ports.MSG_SERVER);
 
-				while (true) {
-					Socket client = server.accept();
-					System.out.println("Client connected with IP: " + client.getRemoteSocketAddress());
-					new AuthenticationHandler(client);
-				}
-			} finally {
-				if (server != null) server.close();
+		try (ServerSocket server = new ServerSocket(Ports.MSG_SERVER)) {
+
+			while (true) {
+				Socket client = server.accept();
+				System.out.println("Client connected with IP: " + client.getRemoteSocketAddress());
+				new AuthenticationHandler(client);
 			}
+
 		} catch (BindException e) {
 			System.err.println("There is already a server running on this port. Server is shuting down.");
 			e.printStackTrace();
@@ -79,9 +79,9 @@ public class MessagingServer {
 		@Override
 		public void run() {
 			try {
+				// keep trying until it fails
 				boolean failed = true;
 				while (failed) {
-					//PrintWriter pw = new PrintWriter(client.getOutputStream(), true);
 
 					ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 					Auth receivedUser = (Auth) ois.readObject();
@@ -108,6 +108,7 @@ public class MessagingServer {
 						authenticatedUser.setPassword("");
 						failed = false;// stop AuthenticationHandler
 
+						// authenticate customer
 						if (authenticatedUser.getClientType() == ClientType.CUSTOMER) {
 							Customer customer = (Customer) authenticatedUser; 
 							customer.setInetAddress(client.getInetAddress());
@@ -118,6 +119,8 @@ public class MessagingServer {
 
 							CustomerInfo customerInfo = new CustomerInfo(customer, client);
 							connectionQueue.put(customerInfo);
+
+						// authenticate agent
 						} else {
 							Agent agent = (Agent) authenticatedUser;
 							agent.setInetAddress(client.getInetAddress());
