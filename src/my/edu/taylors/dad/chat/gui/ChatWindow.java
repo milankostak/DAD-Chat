@@ -19,7 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -40,7 +39,7 @@ public abstract class ChatWindow extends JFrame {
 	private JTextField tfMainInput;
 	private JButton btSendBoth, btSend, btLogOut, btCapture, btStopSend, btStopSendBoth, btStopReplay;
 	private ChatListModel chatListModel;
-	private JScrollBar vertical;
+	private JList<Message> chatList;
 	private ClientType clientType;
 
 	private VoiceClient voiceClient;
@@ -112,7 +111,7 @@ public abstract class ChatWindow extends JFrame {
 	private Component getMessagePanel() {
 		chatListModel = new ChatListModel();
 
-		JList<Message> chatList = new JList<Message>(chatListModel);
+		chatList = new JList<Message>(chatListModel);
 		chatList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		chatList.setVisibleRowCount(15); 
 		DefaultListCellRenderer renderer = (DefaultListCellRenderer) chatList.getCellRenderer();
@@ -127,7 +126,6 @@ public abstract class ChatWindow extends JFrame {
 		});
 
 		JScrollPane chatListScroll = new JScrollPane(chatList);
-		vertical = chatListScroll.getVerticalScrollBar();
 
 		return chatListScroll;
 	}
@@ -306,7 +304,9 @@ public abstract class ChatWindow extends JFrame {
 	public void addMessage(Message message) {
 		chatListModel.getMessages().add(message);
 		chatListModel.update();
-		scrollDown();
+		
+		// scroll down to see the newest message
+		chatList.setSelectedValue(message, true);
 	}
 
 	/**
@@ -319,13 +319,6 @@ public abstract class ChatWindow extends JFrame {
 		tfMainInput.setEnabled(false);
 		btCapture.setEnabled(false);
 		btStopSend.setEnabled(false);
-	}
-	
-	/**
-	 * Scroll down the chat window to see the newest messages
-	 */
-	private void scrollDown() {
-		vertical.setValue(vertical.getMaximum());
 	}
 
 	public boolean isLoggingOut() {
