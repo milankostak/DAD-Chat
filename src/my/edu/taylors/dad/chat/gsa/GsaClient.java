@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import my.edu.taylors.dad.chat.entity.Ports;
 
 /**
@@ -20,19 +22,20 @@ import my.edu.taylors.dad.chat.entity.Ports;
  */
 public class GsaClient extends Thread {
 
-	public GsaClient() { }
+	private volatile boolean addressReceived = false;
 	
 	public String getAddress() {
 		String serverAddress = null;
 		try {
 			try (ServerSocket serverConn = new ServerSocket(Ports.GSA_CLIENT)) {
-				
+
 				start();// start thread for sending requests
 				// then wait for reply
 				Socket socket = serverConn.accept();
 				
 				serverAddress = socket.getInetAddress().getHostAddress();
 				System.out.println("Received server address: " + serverAddress);
+				addressReceived = true;
 
 			}
 		} catch (Exception e) {
@@ -44,30 +47,41 @@ public class GsaClient extends Thread {
 	
 	@Override
 	public void run() {
-		try {
-			List<InetAddress> broadcastAddresss = new ArrayList<>();
-	
-			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-	
-			while (interfaces.hasMoreElements()) {
-				// hw interface
-				NetworkInterface interf = (NetworkInterface) interfaces.nextElement();
-				if (interf.isUp()) {
-	
-					for (InterfaceAddress address : interf.getInterfaceAddresses()) {
-						if (address.getBroadcast() != null) {
-							broadcastAddresss.add(address.getBroadcast());
+		int counter = 0;
+		int limit = 5;
+		while(!addressReceived) {
+			try {
+				List<InetAddress> broadcastAddresss = new ArrayList<>();
+		
+				Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+		
+				while (interfaces.hasMoreElements()) {
+					// hw interface
+					NetworkInterface interf = (NetworkInterface) interfaces.nextElement();
+					if (interf.isUp()) {
+		
+						for (InterfaceAddress address : interf.getInterfaceAddresses()) {
+							if (address.getBroadcast() != null) {
+								broadcastAddresss.add(address.getBroadcast());
+							}
 						}
-					}
-	
-			    }
+		
+				    }
+				}
+
+				for (int i = 0; i < broadcastAddresss.size(); i++) {
+					sendBroadcast(broadcastAddresss.get(i));
+				}
+
+				if (++counter > limit) {
+					showFail();
+				} else {
+					// wait 2 seconds for server address, if not received send requests again
+					Thread.sleep(2000);
+				}
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
 			}
-			
-			for (int i = 0; i < broadcastAddresss.size(); i++) {
-				sendBroadcast(broadcastAddresss.get(i));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -78,6 +92,15 @@ public class GsaClient extends Thread {
 		DatagramSocket dgSocket = new DatagramSocket();
 		dgSocket.send(packet);
 		dgSocket.close();
+	}
+	
+	private void showFail() {
+		JOptionPane.showMessageDialog(
+					null,
+					"Client was unable to find server.\nPlease try again later.",
+					"Server not found",
+					JOptionPane.ERROR_MESSAGE);
+		System.exit(0);
 	}
 
 }
