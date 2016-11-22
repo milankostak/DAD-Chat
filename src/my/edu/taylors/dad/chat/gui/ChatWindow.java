@@ -83,6 +83,8 @@ public abstract class ChatWindow extends JFrame {
 	 */
 	protected abstract void sendVoiceFinished();
 
+	protected abstract void sendClear();
+
 	/**
 	 * Main method for setting up the GUI
 	 * @param title
@@ -249,6 +251,7 @@ public abstract class ChatWindow extends JFrame {
 		byte[] voiceData = stopCapture();
 		addMessage(new Message(voiceData, ClientType.ME));
 		sendVoiceFinished();
+		ClientAgent.sendClear();
 	}
 
 	private void sendVoiceBoth() {

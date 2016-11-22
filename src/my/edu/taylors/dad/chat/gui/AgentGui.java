@@ -60,6 +60,14 @@ public class AgentGui extends ChatWindow {
 	}
 
 	@Override
+	public void sendClear() {
+		if (!isLoggingOut()) {
+			writer.println(Flags.VOICE_CAPTURE_CLEAR);
+			writer.println(clientId);
+		}
+	}
+
+	@Override
 	protected void setupWriter() {
 		try {
 			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);

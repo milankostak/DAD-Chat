@@ -87,6 +87,9 @@ public class ClientCustomer extends Thread {
 						byte[] voiceData = voiceServer.getByteOutputStream();
 						Message msg = new Message(voiceData, ClientType.NOT_ME);
 						gui.addMessage(msg);
+
+					} else if (flag.equals(Flags.VOICE_CAPTURE_CLEAR)) {
+						voiceServer.getByteOutputStream();
 						
 					} else {
 						String message = fromServer.readLine();

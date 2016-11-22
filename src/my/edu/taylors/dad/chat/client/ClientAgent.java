@@ -59,6 +59,13 @@ public class ClientAgent extends Thread {
 		}
 	}
 
+	public static void sendClear() {
+		for (Map.Entry<Integer, AgentGui> entry : windows.entrySet()) {
+			AgentGui gui = entry.getValue();
+			gui.sendClear();
+		}
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -87,6 +94,9 @@ public class ClientAgent extends Thread {
 					if (agentGui != null) {
 						agentGui.addMessage(msg);
 					}
+
+				} else if (message.equals(Flags.VOICE_CAPTURE_CLEAR)) {
+					voiceServer.getByteOutputStream();
 					
  				} else {
  					int customerId = Integer.parseInt(message);
