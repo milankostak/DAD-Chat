@@ -3,10 +3,12 @@ package my.edu.taylors.dad.chat.voice;
 import javax.sound.sampled.AudioFormat;
 
 /**
- * For source see {@link VoiceServer}
+ * For source see {@link VoiceServer}<br>
+ * 
+ * Just a set of utils for work with voice
  */
 public class VoiceUtils {
-	
+
 	public static final int PACKET_SIZE = 1000; 
 
 	private VoiceUtils() { }

@@ -22,8 +22,13 @@ import java.net.MulticastSocket;
  * 	<li>VoiceServer extends a Thread now</li>
  * 	<li>Completely removed GUI</li>
  * 	<li>Server now doesn't play immediately, but stores the sound for later play</li>
- * 	<li>Memory synchronization (volatile) </li>
+ * 	<li>Memory synchronization (volatile)</li>
+ * 	<li>Switched from broadcast to multicast</li>
  * </ul>
+ * 
+ * This class is for receiving voice data.<br>
+ * It keeps receiving on given multicast address on given port.<br>
+ * Data can be retrieved by getByteOutputStream() method.
  */
 public class VoiceServer extends Thread {
 
@@ -42,6 +47,10 @@ public class VoiceServer extends Thread {
 		start();
 	}
 
+	/**
+	 * When getting the voice data, it is also marked as to be cleared
+	 * @return
+	 */
 	public byte[] getByteOutputStream() {
 		cleared = true;
 		return byteOutputStream.toByteArray();
@@ -61,7 +70,7 @@ public class VoiceServer extends Thread {
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
 				System.out.println("RECEIVED: " + receivePacket.getAddress().getHostAddress() + ":" + receivePacket.getPort());
-				
+
 				if (cleared) {
 					byteOutputStream = new ByteArrayOutputStream();
 					cleared = false;

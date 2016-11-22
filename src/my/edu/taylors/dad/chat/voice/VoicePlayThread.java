@@ -12,7 +12,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 /**
- * For source see {@link VoiceServer}
+ * For source see {@link VoiceServer}<br>
+ * Thread for playing of either captured or received sound
  */
 public class VoicePlayThread extends Thread {
 
@@ -20,6 +21,10 @@ public class VoicePlayThread extends Thread {
 	private SourceDataLine sourceLine;
 	private volatile boolean stopPlaying;
 
+	/**
+	 * Basic constructor which needs data to play as parameter
+	 * @param voiceArray
+	 */
 	public VoicePlayThread(byte[] voiceArray) {
 		setVariables(voiceArray);
 		stopPlaying = false;
@@ -37,8 +42,6 @@ public class VoicePlayThread extends Thread {
 					sourceLine.write(tempBuffer, 0, count);
 				}
 			}
-			// sourceLine.drain();
-			// sourceLine.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -48,6 +51,10 @@ public class VoicePlayThread extends Thread {
 		this.stopPlaying = stopPlaying;
 	}
 
+	/**
+	 * Create necessary objects, after that playing is started
+	 * @param voiceArray
+	 */
 	public void setVariables(byte[] voiceArray) {
 		try {
 			InputStream byteInputStream = new ByteArrayInputStream(voiceArray);
