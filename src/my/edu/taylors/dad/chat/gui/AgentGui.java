@@ -59,7 +59,6 @@ public class AgentGui extends ChatWindow {
 		}
 	}
 
-	@Override
 	public void sendClear() {
 		if (!isLoggingOut()) {
 			writer.println(Flags.VOICE_CAPTURE_CLEAR);

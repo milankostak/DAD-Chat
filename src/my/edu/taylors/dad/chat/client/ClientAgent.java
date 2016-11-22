@@ -113,9 +113,6 @@ public class ClientAgent extends Thread {
 						agentGui.addMessage(msg);
 					}
 
-				} else if (message.equals(Flags.VOICE_CAPTURE_CLEAR)) {
-					voiceServer.getByteOutputStream();
-
 				// otherwise receive normal text message
  				} else {
  					int customerId = Integer.parseInt(message);

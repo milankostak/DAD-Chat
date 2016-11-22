@@ -83,8 +83,6 @@ public abstract class ChatWindow extends JFrame {
 	 */
 	protected abstract void sendVoiceFinished();
 
-	protected abstract void sendClear();
-
 	/**
 	 * Main method for setting up the GUI
 	 * @param title

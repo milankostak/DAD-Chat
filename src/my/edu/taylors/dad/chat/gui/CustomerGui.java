@@ -47,14 +47,6 @@ public class CustomerGui extends ChatWindow {
 	}
 
 	@Override
-	protected void sendClear() {
-		if (!isLoggingOut()) {
-			writer.println(Flags.VOICE_CAPTURE_CLEAR);
-			writer.println(otherSideId);
-		}
-	}
-
-	@Override
 	protected void setupWriter() {
 		try {
 			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);

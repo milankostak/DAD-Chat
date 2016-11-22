@@ -174,7 +174,7 @@ public class ServerAgent extends Thread {
 									client.close();
 
 								// when TODO
-								} else if (receivedId.equals(Flags.VOICE_CAPTURE_FINISHED) || receivedId.equals(Flags.VOICE_CAPTURE_CLEAR)) {
+								} else if (receivedId.equals(Flags.VOICE_CAPTURE_FINISHED)) {
 									String receivedId2 = brFromCustomer.readLine();
 									pwToAgent.println(receivedId);
 									pwToAgent.println(receivedId2);
